@@ -4,6 +4,48 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# TODO: Liste med tiles
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# TODO: Main loop
+
+
+
+
+
+
+
+
+
+
+'''
                XXXXXXXXX
          XXXXXXXXXXXXXXXXXXXXX
       XXXXXX   XXXXXXXXX   XXXXXX
@@ -13,6 +55,4 @@
       XXXXXX   XXXXXXXXX   XXXXXX
          XXXXXX         XXXXXX
                XXXXXXXXX
-
-
-
+'''
