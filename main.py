@@ -20,7 +20,7 @@ gameWindow = pygame.display.set_mode([screenWidth, screenHeight])
 pygame.display.set_caption('aMAZEing')
 
 # Define center coordinates
-centerX, centerY = screenWidth / 2
+centerX, centerY = screenWidth / 2, screenWidth / 2
 print(screenWidth)
 print(centerX)
 print(screenHeight)
@@ -29,6 +29,8 @@ print(centerY)
 # Define pixel size
 # Format for new pixel size should be 320:180
 px = round(screenHeight / 180)
+
+Running = True
 
 '''
 # Load sounds
@@ -148,7 +150,7 @@ while Running:
     s_moved = 0
     d_moved = 0
 
-    gameWindow.fill('darkpurple')
+    gameWindow.fill('purple')
 
     # Check for pygame events
     for event in pygame.event.get():
