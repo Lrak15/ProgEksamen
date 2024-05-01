@@ -1,9 +1,5 @@
-import pygame
-
-from main import *
-
 # Game Object parent class
-class GameObject:
+"""class GameObject:
     def __init__(self, x, y, width, height, game_window, object):
         self.gw = game_window
         self.x = x
@@ -43,4 +39,4 @@ class Tile(GameObject):
 # TODO: Fog class
 
 
-# TODO: Enemy class
+# TODO: Enemy class"""""
