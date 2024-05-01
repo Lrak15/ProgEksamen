@@ -6,7 +6,6 @@ from random import randrange
 
 import pygame
 from pygame import mixer
-from Classes import Player
 
 pygame.init()
 mixer.init()
@@ -151,11 +150,7 @@ while Running:
     s_moved = 0
     d_moved = 0
 
-    gameWindow.fill('yellow')
-
-    # Player instances
-    player1 = Player(50, 50, 100, 200, 1)
-    player2 = Player(50, 50, 400, 600, 2)
+    gameWindow.fill('purple')
 
     # Check for pygame events
     for event in pygame.event.get():
