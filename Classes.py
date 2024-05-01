@@ -1,42 +1,41 @@
+import pygame
+
 # Game Object parent class
-"""class GameObject:
-    def __init__(self, x, y, width, height, game_window, object):
+class GameObject:
+    def __init__(self, game_window, xPos, yPos, width, height, color):
         self.gw = game_window
-        self.x = x
-        self.y = y
+        self.x = xPos
+        self.y = yPos
         self.w = width
         self.h = height
-        self.image = pygame.image.load(object)
-        self.rect = self.image.get_rect()
+        self.color = color
+        self.px = round(pygame.display.Info().current_h/180)
+
 
     def draw(self):
-        gameWindow.blit(self.image, (self.x, self.y))
+        pygame.draw.rect(self.gw, self.color, pygame.Rect(self.x, self.y, self.w, self.h))
 
 
 # Meget simpel player klasse for nu, ændres senere, men fin til debugging atm :))
-#class Player(GameObject):
-    #def __init__(self, xPos, yPos, player, width, height):
-       # super().__init__(width, height)
-       # self.x = xPos
-       # self.y = yPos
-       # self.w = width
-       # self.h = height
-      #  self.player = player
+class Player(GameObject):
+    def __init__(self, game_window, xPos, yPos, width, height, color, player):
+       super().__init__(game_window, xPos, yPos, width, height, color)
+       self.player = player
 
 
 # Tile klassen
 class Tile(GameObject):
-    def __init__(self,  count):
-        self.count =
+    def __init__(self, game_window, xPos, yPos, width, height, color, count):
+        super().__init__(game_window, xPos, yPos, width, height, color)
+        self.count = count
 
 
-        # Jeg er meget sikker, jeg går ikke til medierne
-
-
-# TODO: Wall class
+class Wall(GameObject):
+    def __init__(self, game_window, xPos, yPos, width, height, color):
+        super().__init__(game_window, xPos, yPos, width, height, color)
 
 
 # TODO: Fog class
 
 
-# TODO: Enemy class"""""
+# TODO: Enemy class
