@@ -15,7 +15,7 @@ fps = 99999999999999999999999999999999999999999999999999999999999999999999999999
 timer = pygame.time.Clock()
 
 # Set up game window
-screenWidth, screenHeight = pygame.display.Info().current_w, pygame.display.Info().current_w
+screenWidth, screenHeight = pygame.display.Info().current_h, pygame.display.Info().current_h
 gameWindow = pygame.display.set_mode([screenWidth, screenHeight])
 pygame.display.set_caption('aMAZEing')
 
