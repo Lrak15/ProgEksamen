@@ -18,13 +18,14 @@ class GameObject:
 
 
 # Meget simpel player klasse for nu, ændres senere, men fin til debugging atm :))
-class Player(GameObject):
-    def __init__(self, width, height, xPos, yPos, player):
-        self.x = xPos
-        self.y = yPos
-        self.w = width
-        self.h = height
-        self.player = player
+#class Player(GameObject):
+    #def __init__(self, xPos, yPos, player, width, height):
+       # super().__init__(width, height)
+       # self.x = xPos
+       # self.y = yPos
+       # self.w = width
+       # self.h = height
+      #  self.player = player
 
 
 # Tile klassen
