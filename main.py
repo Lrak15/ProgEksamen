@@ -6,32 +6,50 @@ from random import randrange
 
 import pygame
 from pygame import mixer
-from Classes import Player
+from Classes import Tile
 
 pygame.init()
 mixer.init()
 
 # Set frames per second
-fps = 9999999999999999999999999999999999999999999999999999999999999999999999999999999996999999999
+fps = 20
 timer = pygame.time.Clock()
 
+tileCount = 100
+countdown = tileCount + 10
+
 # Set up game window
-screenWidth, screenHeight = pygame.display.Info().current_w, pygame.display.Info().current_w
+screenWidth, screenHeight = pygame.display.Info().current_h, pygame.display.Info().current_h
 gameWindow = pygame.display.set_mode([screenWidth, screenHeight])
+surface = pygame.Surface((1920, 1080))
 pygame.display.set_caption('aMAZEing')
 
 # Define center coordinates
 centerX, centerY = screenWidth / 2, screenWidth / 2
-print(screenWidth)
-print(centerX)
-print(screenHeight)
-print(centerY)
 
 # Define pixel size
 # Format for new pixel size should be 320:180
-px = round(screenHeight / 180)
+
 
 Running = True
+
+# INSTANCES
+tiles = []
+for i in range(tileCount):
+    peñoslgH = Tile(surface, centerX + 16 + 32 * i - math.floor(i/5) * 32 * 5, 100 + 32 * math.floor(i/5), 24, 24, "green", i)
+    tiles.append(peñoslgH)
+
+    peñoslgV = Tile(surface, centerX - 16 - 32 * i + math.floor(i/5) * 32 * 5, 100 + 32 * math.floor(i/5), 24, 24, "green", i)
+    tiles.append(peñoslgV)
+    print(peñoslgV.count)
+
+    print(f'!!!!!! {i}')
+
+
+walls = []
+
+
+
 
 '''
 # Load sounds
@@ -151,11 +169,22 @@ while Running:
     s_moved = 0
     d_moved = 0
 
-    gameWindow.fill('yellow')
+    surface.fill('purple')
 
-    # Player instances
-    player1 = Player(50, 50, 100, 200, 1)
-    player2 = Player(50, 50, 400, 600, 2)
+    # BLITTING INSTANCES
+
+    for tile in tiles:
+        tile.draw()
+
+    print(countdown)
+
+    countdown -= 1
+
+    for i in range(2):
+        for tile in tiles:
+            if tile.count == countdown:
+                tiles.remove(tile)
+
 
     # Check for pygame events
     for event in pygame.event.get():
@@ -306,16 +335,10 @@ while Running:
     '''
 
     # Update game window
+
+    # Mark Moment
+    display.blit(pygame.transform.scale(surface, (gameWindowWidth, gameWindowHeight)), (0, 0))
     pygame.display.flip()
-
-
-
-
-
-
-
-
-
 
 
 
