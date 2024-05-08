@@ -1,54 +1,121 @@
-# TODO: Basic setup and screen
+#_______________________________________________________________________________________________________________________
+#                       KARL, SOPHIA & AMANDA - EKSAMENSPROJEKT I PROGRAMMERING B 2024
+#_______________________________________________________________________________________________________________________
 
-# Import libraries
+# Import libraries/frameworks
 import math
 from random import randrange
-
 import pygame
 from pygame import mixer
 from Classes import Tile
+from Classes import Player
 
+# Initializing frameworks/libraries
 pygame.init()
 mixer.init()
+
+# Program status variable
+Running = True
+
+font = pygame.font.SysFont("arialblack", 20)
+
+white = (255, 255, 255)
+
+def blitTextOnScreen(text, font, textColor, x, y):
+    image = font.render(text, True, textColor)
+    surface.blit(image, (x, y))
 
 # Set frames per second
 fps = 20
 timer = pygame.time.Clock()
 
+# Setting tilecount and countdown
 tileCount = 100
-countdown = tileCount + 10
+countdown = tileCount + 1
+
+# Key variables - Player 1
+wKey = pygame.K_w
+sKey = pygame.K_s
+aKey = pygame.K_a
+dKey = pygame.K_d
+
+# Key variables - Player 2
+upKey = pygame.K_UP
+leftKey = pygame.K_LEFT
+rightKey = pygame.K_RIGHT
+downKey = pygame.K_DOWN
+
+tileW = 60
+wallW = 20
+
+boots = 1
+pickaxe = 2
+mask = 3
+dagger = 4
+
+items = [boots, pickaxe, mask, dagger]
+player1items, player2items = [], []
+
+#for item in items:
+#    lilbro = (items[item], False)
+#    player1items.append(lilbro)
+#    player2items.append(lilbro)
+
 
 # Set up game window
 screenWidth, screenHeight = pygame.display.Info().current_h, pygame.display.Info().current_h
+canvasWidth, canvasHeight = 2000, 2000
 gameWindow = pygame.display.set_mode([screenWidth, screenHeight])
-surface = pygame.Surface((1920, 1080))
+surface = pygame.Surface((canvasWidth, canvasHeight))
 pygame.display.set_caption('aMAZEing')
 
 # Define center coordinates
-centerX, centerY = screenWidth / 2, screenWidth / 2
-
-# Define pixel size
-# Format for new pixel size should be 320:180
-
-
-Running = True
+centerX, centerY = canvasWidth / 2, canvasHeight / 2
 
 # INSTANCES
+#_______________________________________________________________________________________________________________________
+
+level = 1
+
+mazeW = 19
+
+startH = 40
+
+spacing = tileW + wallW
+
+
+# Tiles instance
 tiles = []
-for i in range(tileCount):
-    peñoslgH = Tile(surface, centerX + 16 + 32 * i - math.floor(i/5) * 32 * 5, 100 + 32 * math.floor(i/5), 24, 24, "green", i)
-    tiles.append(peñoslgH)
-
-    peñoslgV = Tile(surface, centerX - 16 - 32 * i + math.floor(i/5) * 32 * 5, 100 + 32 * math.floor(i/5), 24, 24, "green", i)
-    tiles.append(peñoslgV)
-    print(peñoslgV.count)
-
-    print(f'!!!!!! {i}')
 
 
+
+
+def placeTiles():
+    for i in range(tileCount):
+        if i % math.ceil(mazeW/2) == 0:
+            peñoslgM = Tile(surface, centerX, startH + spacing * math.floor(i/math.ceil(mazeW/2)),
+                            tileW, tileW, "blue", i)
+            tiles.append(peñoslgM)
+
+        else:
+            peñoslgH = Tile(surface, centerX + spacing * (i - math.floor(i / math.ceil(mazeW/2)) * math.ceil(mazeW/2)),
+                            startH + spacing * math.floor(i/math.ceil(mazeW/2)), tileW, tileW, 'blue', i)
+            tiles.append(peñoslgH)
+
+            peñoslgV = Tile(surface,
+                            centerX - spacing * (i - math.floor(i / math.ceil(mazeW / 2)) * math.ceil(mazeW / 2)),
+                            startH + spacing * math.floor(i / math.ceil(mazeW / 2)), tileW, tileW, 'blue', i)
+            tiles.append(peñoslgV)
+
+
+# Player instances
+player1 = Player(surface, 20, 20, 20, 20, "black", 1)
+player2 = Player(surface, 50, 50, 20, 20, "red", 2)
+
+# Wall instance
 walls = []
 
-
+# TODO : Create walls from Wall class
 
 
 '''
@@ -117,9 +184,6 @@ def check_collisions(structure, player):
         if abs(player.hitbox.right - structure.hitbox.left) < collision_tolerance:
             d_moved = 0
 
-
-
-
 TitleScreen = True
 Running = True
 
@@ -157,34 +221,46 @@ while TitleScreen:
 # Inspiration from:
 # https://stackoverflow.com/questions/35068209/how-do-i-repeat-music-using-pygame-mixer
 pygame.mixer.music.play(69)
-
 '''
 
+placeTiles()
+
+# ON THE WINDOW
+#_______________________________________________________________________________________________________________________
 while Running:
     timer.tick(fps)
 
-    movementSpeed = 1
-    w_moved = 0
-    a_moved = 0
-    s_moved = 0
-    d_moved = 0
+    # Speed variables for the players
+    player1moveSpeed = 10
+    player2moveSpeed = 10
 
-    surface.fill('purple')
+    # Backgroundcolor for the game
+    surface.fill('pink')
+
+    #blitTextOnScreen("Press SPACE to play", font, white, canvasWidth / 2, canvasHeight / 2)
+
 
     # BLITTING INSTANCES
+    # __________________________________________________________________________________________________________________
 
     for tile in tiles:
         tile.draw()
 
-    print(countdown)
+    # player1.move(wKey, aKey, sKey, dKey)
+    player1.move(wKey, sKey, aKey, dKey, player1moveSpeed)
+    player2.move(upKey, downKey, leftKey, rightKey, player2moveSpeed)
 
-    countdown -= 1
+    player1.draw()
+    player2.draw()
+
+    # print(countdown)
+
+    countdown -= 0.1 * level
 
     for i in range(2):
         for tile in tiles:
-            if tile.count == countdown:
+            if tile.count >= countdown:
                 tiles.remove(tile)
-
 
     # Check for pygame events
     for event in pygame.event.get():
@@ -337,7 +413,7 @@ while Running:
     # Update game window
 
     # Mark Moment
-    display.blit(pygame.transform.scale(surface, (gameWindowWidth, gameWindowHeight)), (0, 0))
+    gameWindow.blit(pygame.transform.scale(surface, (screenHeight, screenHeight)), (0, 0))
     pygame.display.flip()
 
 
