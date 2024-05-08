@@ -9,6 +9,7 @@ import pygame
 from pygame import mixer
 from Classes import Tile
 from Classes import Player
+from Classes import Wall
 
 # Initializing frameworks/libraries
 pygame.init()
@@ -77,7 +78,8 @@ centerX, centerY = canvasWidth / 2, canvasHeight / 2
 
 level = 1
 
-mazeW = 19
+mazeW = 3
+mazeH = 3
 
 startH = 40
 
@@ -87,18 +89,16 @@ spacing = tileW + wallW
 # Tiles instance
 tiles = []
 
-
-
-
-def placeTiles():
-    for i in range(tileCount):
+def placeTiles(mazeW, mazeH):
+    for i in range(mazeH * math.ceil(mazeW / 2)):
         if i % math.ceil(mazeW/2) == 0:
             peñoslgM = Tile(surface, centerX, startH + spacing * math.floor(i/math.ceil(mazeW/2)),
                             tileW, tileW, "blue", i)
             tiles.append(peñoslgM)
 
         else:
-            peñoslgH = Tile(surface, centerX + spacing * (i - math.floor(i / math.ceil(mazeW/2)) * math.ceil(mazeW/2)),
+            peñoslgH = Tile(surface,
+                            centerX + spacing * (i - math.floor(i / math.ceil(mazeW/2)) * math.ceil(mazeW/2)),
                             startH + spacing * math.floor(i/math.ceil(mazeW/2)), tileW, tileW, 'blue', i)
             tiles.append(peñoslgH)
 
@@ -109,11 +109,16 @@ def placeTiles():
 
 
 # Player instances
-player1 = Player(surface, 20, 20, 20, 20, "black", 1)
-player2 = Player(surface, 50, 50, 20, 20, "red", 2)
+player1 = Player(surface, 20, 20, 20, 20, "green", 1)
+player2 = Player(surface, 50, 50, 20, 20, "purple", 2)
 
 # Wall instance
 walls = []
+
+def placeWalls(mazeW, mazeH):
+    for i in range((mazeW - 1) * (mazeH - 1)):
+        sùlñpèg = Wall(surface, centerX - math.floor(mazeW/2) + spacing * (i - math.floor(i / math.ceil(mazeW/2)) * math.ceil(mazeW/2)), startH, wallW, wallW, "black")
+        walls.append(sùlñpèg)
 
 # TODO : Create walls from Wall class
 
@@ -223,7 +228,8 @@ while TitleScreen:
 pygame.mixer.music.play(69)
 '''
 
-placeTiles()
+placeTiles(7, 20)
+placeWalls(7, 20)
 
 # ON THE WINDOW
 #_______________________________________________________________________________________________________________________
@@ -245,6 +251,9 @@ while Running:
 
     for tile in tiles:
         tile.draw()
+
+    for wall in walls:
+        wall.draw()
 
     # player1.move(wKey, aKey, sKey, dKey)
     player1.move(wKey, sKey, aKey, dKey, player1moveSpeed)
