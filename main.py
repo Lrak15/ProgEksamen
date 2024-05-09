@@ -4,12 +4,13 @@
 
 # Import libraries/frameworks
 import math
-from random import randrange
+# from random import randrange
 import pygame
 from pygame import mixer
 from Classes import Tile
 from Classes import Player
 from Classes import Wall
+# from Classes import Button
 
 # Initializing frameworks/libraries
 pygame.init()
@@ -17,14 +18,6 @@ mixer.init()
 
 # Program status variable
 Running = True
-
-font = pygame.font.SysFont("arialblack", 20)
-
-white = (255, 255, 255)
-
-def blitTextOnScreen(text, font, textColor, x, y):
-    image = font.render(text, True, textColor)
-    surface.blit(image, (x, y))
 
 # Set frames per second
 fps = 69
@@ -54,8 +47,8 @@ pickaxe = 2
 mask = 3
 dagger = 4
 
-items = [boots, pickaxe, mask, dagger]
-player1items, player2items = [], []
+# items = [boots, pickaxe, mask, dagger]
+# player1items, player2items = [], []
 
 #for item in items:
 #    lilbro = (items[item], False)
@@ -85,8 +78,6 @@ startH = 80
 
 spacing = tileW + wallW
 
-
-
 # TODONE: Liste med tiles
 
 # Tiles instance
@@ -96,18 +87,18 @@ def placeTiles(mazeW, mazeH):
     for i in range(mazeH * math.ceil(mazeW / 2)):
         if i % math.ceil(mazeW/2) == 0:
             peñoslgM = Tile(surface, centerX - tileW/2, startH + spacing * math.floor(i/math.ceil(mazeW/2)),
-                            tileW, tileW, "purple", i)
+                            tileW, tileW, "darkslategray4", i)
             tiles.append(peñoslgM)
 
         else:
             peñoslgH = Tile(surface,
                             centerX - tileW/2 + spacing * (i - math.floor(i / math.ceil(mazeW/2)) * math.ceil(mazeW/2)),
-                            startH + spacing * math.floor(i/math.ceil(mazeW/2)), tileW, tileW, 'purple', i)
+                            startH + spacing * math.floor(i/math.ceil(mazeW/2)), tileW, tileW, 'darkslategray4', i)
             tiles.append(peñoslgH)
 
             peñoslgV = Tile(surface,
                             centerX - tileW/2 - spacing * (i - math.floor(i / math.ceil(mazeW / 2)) * math.ceil(mazeW / 2)),
-                            startH + spacing * math.floor(i / math.ceil(mazeW / 2)), tileW, tileW, 'purple', i)
+                            startH + spacing * math.floor(i / math.ceil(mazeW / 2)), tileW, tileW, 'darkslategray4', i)
             tiles.append(peñoslgV)
 
 
@@ -177,20 +168,21 @@ placeWalls(mazeW, mazeH)
 
 # ON THE WINDOW
 #_______________________________________________________________________________________________________________________
-while Running:
+running = True
+
+while running:
+    playMousePos = pygame.mouse.get_pos()
+
+    # Backgroundcolor for the game
+    surface.fill('darkslategrey')
+
     timer.tick(fps)
 
     # Speed variables for the players
     player1moveSpeed = 10
     player2moveSpeed = 10
 
-    # Backgroundcolor for the game
-    surface.fill('darkgrey')
-
     pygame.draw.rect(surface, 'black', pygame.Rect(0, 0, canvasWidth, canvasHeight),60)
-
-    #blitTextOnScreen("Press SPACE to play", font, white, canvasWidth / 2, canvasHeight / 2)
-
 
     # BLITTING INSTANCES
     # __________________________________________________________________________________________________________________
@@ -224,19 +216,18 @@ while Running:
         if event.type == pygame.KEYDOWN:
             # Close game if escape key is pressed
             if event.key == pygame.K_ESCAPE:
-                Running = False
+                running = False
 
         # Close game if the game windows close button is pressed
         elif event.type == pygame.QUIT:
-            Running = False
+            running = False
 
+        # Update game window
 
+        # Mark Moment
+        gameWindow.blit(pygame.transform.scale(surface, (screenHeight, screenHeight)), (0, 0))
+        pygame.display.flip()
 
-    # Update game window
-
-    # Mark Moment
-    gameWindow.blit(pygame.transform.scale(surface, (screenHeight, screenHeight)), (0, 0))
-    pygame.display.flip()
 
 
 

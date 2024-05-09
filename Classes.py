@@ -1,18 +1,17 @@
 import math
-
 import pygame
+
+pygame.init()
 
 # Game Object parent class
 class GameObject:
     def __init__(self, game_window, xPos, yPos, width, height, color):
-
         self.gw = game_window
         self.x = xPos
         self.y = yPos
         self.w = width
         self.h = height
         self.color = color
-        self.px = round(pygame.display.Info().current_h/180)
 
     def draw(self):
         pygame.draw.rect(self.gw, self.color, pygame.Rect(self.x, self.y, self.w, self.h))
@@ -22,7 +21,6 @@ class GameObject:
 class Player(GameObject):
     def __init__(self, game_window, xPos, yPos, width, height, color, player):
        super().__init__(game_window, xPos, yPos, width, height, color)
-
        self.player = player
 
     def move(self, up, down, left, right, movespeed):
@@ -41,30 +39,37 @@ class Player(GameObject):
         if key[right]:
             right_moved = movespeed
 
-        '''The following code checks if a movement in the vertical direction and a movement in the horizontal direction
-        both aren't equal to 0, meaning that there is diagonal movement. If so, both movement directions, making up
-        the diagonal movement, is shortened, so that the diagonal movement speed is the same speed as vertical or
-        horizontal movement'''
-
         if up_moved and left_moved != 0:
-            up_moved = -math.sin(45) * movespeed
-            left_moved = -math.sin(45) * movespeed
+            up_moved = -math.sin(math.radians(45)) * movespeed
+            left_moved = -math.sin(math.radians(45)) * movespeed
 
         if up_moved and right_moved != 0:
-            up_moved = -math.sin(45) * movespeed
-            right_moved = math.sin(45) * movespeed
+            up_moved = -math.sin(math.radians(45)) * movespeed
+            right_moved = math.sin(math.radians(45)) * movespeed
 
         if down_moved and left_moved != 0:
-            down_moved = math.sin(45) * movespeed
-            left_moved = -math.sin(45) * movespeed
+            down_moved = math.sin(math.radians(45)) * movespeed
+            left_moved = -math.sin(math.radians(45)) * movespeed
 
         if down_moved and right_moved != 0:
-            down_moved = math.sin(45) * movespeed
-            right_moved = math.sin(45) * movespeed
+            down_moved = math.sin(math.radians(45)) * movespeed
+            right_moved = math.sin(math.radians(45)) * movespeed
 
-        # Movement in all directions is added up
         self.x += left_moved + right_moved
-        self. y += up_moved + down_moved
+        self.y += up_moved + down_moved
+
+
+class Button:
+    def __init__(self, x, y, image, scaling):
+        width = image.get_width()
+        height = image.get_height()
+        self.image = image.transform.scale(image, (int(width * scaling), int(height * scaling)))
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
+
+    def drawButton(self):
+        surface.blit(self, (self.rect.x, self.rect.y))
+
 
 
 # Tile klassen
@@ -90,7 +95,5 @@ class Fog(GameObject):
 class Item(GameObject):
     def __init__(self, game_window, xPos, yPos, width, height, color, name, pickedUp):
         super().__init__(game_window, xPos, yPos, width, height, color)
-
         self.name = name
         self.picked = pickedUp
-
