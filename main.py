@@ -4,6 +4,7 @@
 
 # Import libraries/frameworks
 import math
+import random
 # from random import randrange
 import pygame
 from pygame import mixer
@@ -20,7 +21,7 @@ mixer.init()
 Running = True
 
 # Set frames per second
-fps = 69
+fps = 20
 timer = pygame.time.Clock()
 
 # Setting tilecount and countdown
@@ -69,10 +70,35 @@ centerX, centerY = canvasWidth / 2, canvasHeight / 2
 # INSTANCES
 #_______________________________________________________________________________________________________________________
 
-level = 1
+level = 0
 
-mazeW = 23
-mazeH = 23
+
+def generateMaze():
+    global level
+
+    level += 1
+
+    tiles.clear()
+    outerWalls.clear()
+    innerWalls.clear()
+
+    findDimensions()
+    placeTiles(mazeW, mazeH)
+    placeOuterWalls(mazeW, mazeH)
+    placeInnerWalls(mazeW, mazeH)
+
+
+def findDimensions():
+    global mazeW, mazeH
+    mazeW = random.randrange(3, 23)
+    mazeH = random.randrange(3, 23)
+    print(mazeW)
+    print(mazeH)
+    if mazeW % 2 == 0 or mazeH % 2 == 0:
+        print('error!')
+        findDimensions()
+
+
 
 startH = 80
 
@@ -108,24 +134,45 @@ player2 = Player(surface, 50, 50, 20, 20, "red", 2)
 
 
 
+# TODONE : Create outer walls from Wall class
+
+outerWalls = []
+def placeOuterWalls(mazeW, mazeH):
+    leftWall = Wall(surface, centerX + tileW/2 - spacing * math.floor((mazeW + 2)/2),
+                   startH - wallW, wallW, mazeH * spacing + wallW, "magenta")
+    rightWall = Wall(surface, centerX - tileW / 2 - wallW + spacing * math.floor((mazeW + 2) / 2),
+                    startH - wallW, wallW, mazeH * spacing + wallW, "magenta")
+
+    leftUpperWall = Wall(surface, centerX + tileW/2 - spacing * math.floor((mazeW + 2)/2),
+                   startH - wallW, math.floor(mazeW/2) * spacing + wallW, wallW, "magenta")
+    rightUpperWall = Wall(surface, centerX + tileW/2,
+                   startH - wallW, math.floor(mazeW/2) * spacing + wallW, wallW, "magenta")
+
+    bottomWall = Wall(surface, centerX + tileW/2 - spacing * math.floor((mazeW + 2)/2),
+                   startH + mazeH * spacing - wallW, mazeW * spacing + wallW, wallW, "magenta")
+
+    outerWalls.append(leftWall)
+    outerWalls.append(rightWall)
+    outerWalls.append(leftUpperWall)
+    outerWalls.append(rightUpperWall)
+    outerWalls.append(bottomWall)
+
+
+
 # TODO : Create walls from Wall class
 
 # Wall instance
-walls = []
+innerWalls = []
 
-def placeWalls(mazeW, mazeH):
-    for i in range(23):
-        sùlñpèg = Wall(surface, centerX + spacing * (i - math.floor(i/mazeW) * (i/mazeW)),
-                       startH + tileW + spacing * math.floor(i/mazeW), wallW, wallW, "magenta")
-        walls.append(sùlñpèg)
+def placeInnerWalls(mazeW, mazeH):
+    for i in range((mazeW - 1) * (mazeH - 1)):
+        sùlñpèg = Wall(surface, centerX + tileW/2 - spacing * math.floor(mazeW/2) + spacing * (i - math.floor(i/(mazeW - 1)) * (mazeW - 1)),
+                       startH + tileW + spacing * math.floor(i/(mazeW - 1)), wallW, wallW, "magenta")
+        innerWalls.append(sùlñpèg)
 
 
-# sùlñpèg = Wall(surface, centerX + tileW/2 - spacing * math.floor(mazeW/2) + spacing * (i - math.floor(i / mazeW * mazeW)), startH + tileW, wallW, wallW, "magenta")
 
-#centerX - tileW/2 + spacing * (i - math.floor(i / math.ceil(mazeW/2)) * math.ceil(mazeW/2))
 
-#(mazeW - 1) * (mazeH - 1)
-# + spacing * (i - math.floor(i / math.ceil(mazeW/2)) * math.ceil(mazeW/2))
 
 '''
 # Load sounds
@@ -163,8 +210,16 @@ def check_collisions(structure, player):
 pygame.mixer.music.play(69)
 '''
 
+
+'''
+findDimensions()
+
 placeTiles(mazeW, mazeH)
-placeWalls(mazeW, mazeH)
+placeOuterWalls(mazeW, mazeH)
+placeInnerWalls(mazeW, mazeH)
+'''
+
+generateMaze()
 
 # ON THE WINDOW
 #_______________________________________________________________________________________________________________________
@@ -190,7 +245,10 @@ while running:
     for tile in tiles:
         tile.draw()
 
-    for wall in walls:
+    for wall in outerWalls:
+        wall.draw()
+
+    for wall in innerWalls:
         wall.draw()
 
     # player1.move(wKey, aKey, sKey, dKey)
@@ -217,6 +275,9 @@ while running:
             # Close game if escape key is pressed
             if event.key == pygame.K_ESCAPE:
                 running = False
+
+            if event.key == pygame.K_SPACE:
+                generateMaze()
 
         # Close game if the game windows close button is pressed
         elif event.type == pygame.QUIT:
