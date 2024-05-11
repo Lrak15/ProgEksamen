@@ -24,10 +24,6 @@ Running = True
 fps = 20
 timer = pygame.time.Clock()
 
-# Setting tilecount and countdown
-tileCount = 300
-countdown = tileCount + 1
-
 # Key variables - Player 1
 wKey = pygame.K_w
 sKey = pygame.K_s
@@ -74,7 +70,7 @@ level = 0
 
 
 def generateMaze():
-    global level
+    global level, countdown
 
     level += 1
 
@@ -86,6 +82,8 @@ def generateMaze():
     placeTiles(mazeW, mazeH)
     placeOuterWalls(mazeW, mazeH)
     placeInnerWalls(mazeW, mazeH)
+
+    countdown = 100
 
 
 def findDimensions():
@@ -165,10 +163,42 @@ def placeOuterWalls(mazeW, mazeH):
 innerWalls = []
 
 def placeInnerWalls(mazeW, mazeH):
+
+    iterations = random.randrange(1, 5)
+
+    for i in range(iterations):
+        upDirection, downDirection, leftDirection, rightDirection = 0, 0, 0, 0
+        randomDirection = random.randrange(4)
+        if randomDirection == 0:
+            upDirection = 4
+
+        elif randomDirection == 1:
+            downDirection = 4
+
+        elif randomDirection == 2:
+            leftDirection = 4
+
+        elif randomDirection == 3:
+            rightDirection = 4
+
+            sùlñpèg = Wall(surface, centerX + tileW / 2 - spacing * math.floor(mazeW / 2) + spacing * (
+                        i - math.floor(i / (mazeW - 1)) * (mazeW - 1)) - leftDirection * wallW,
+                           startH + tileW + spacing * math.floor(i / (mazeW - 1)) - upDirection * wallW, wallW + wallW * leftDirection + wallW *  rightDirection, wallW + wallW * upDirection + wallW * downDirection, "magenta")
+            innerWalls.append(sùlñpèg)
+
+
+'''
     for i in range((mazeW - 1) * (mazeH - 1)):
         sùlñpèg = Wall(surface, centerX + tileW/2 - spacing * math.floor(mazeW/2) + spacing * (i - math.floor(i/(mazeW - 1)) * (mazeW - 1)),
                        startH + tileW + spacing * math.floor(i/(mazeW - 1)), wallW, wallW, "magenta")
         innerWalls.append(sùlñpèg)
+        num = random.randrange(3)
+        if num > 1:
+            sùlñpèg2 = Wall(surface, centerX + tileW / 2 - spacing * math.floor(mazeW / 2) + spacing * (
+                        i - math.floor(i / (mazeW - 1)) * (mazeW - 1)),
+                           startH + tileW + spacing * math.floor(i / (mazeW - 1)), wallW, wallW * 4, "magenta")
+            innerWalls.append(sùlñpèg2)
+'''
 
 
 
