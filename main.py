@@ -214,6 +214,11 @@ def placeInnerWalls(mazeW, mazeH):
             elif direction == 4:
                 xPos += 4 * wallH
 
+#############################
+### START PÅ RANDOM POINT ###
+#############################
+
+# https://www.geeksforgeeks.org/python-ways-to-shuffle-a-list/
 
 
 '''
