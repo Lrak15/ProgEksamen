@@ -163,28 +163,57 @@ def placeOuterWalls(mazeW, mazeH):
 innerWalls = []
 
 def placeInnerWalls(mazeW, mazeH):
+    randomizing = True
 
-    iterations = random.randrange(1, 5)
+    #for i in range(1):
+    for i in range((mazeW - 1) * (mazeH - 1)):
 
-    for i in range(iterations):
-        upDirection, downDirection, leftDirection, rightDirection = 0, 0, 0, 0
-        randomDirection = random.randrange(4)
-        if randomDirection == 0:
-            upDirection = 4
+        xPos = centerX + tileW / 2 - spacing * math.floor(mazeW / 2) + spacing * (
+                    i - math.floor(i / (mazeW - 1)) * (mazeW - 1))
+        yPos = startH + tileW + spacing * math.floor(i / (mazeW - 1))
 
-        elif randomDirection == 1:
-            downDirection = 4
+        iterations = random.randrange(1, 5)
 
-        elif randomDirection == 2:
-            leftDirection = 4
+        oppositeDirection = None
 
-        elif randomDirection == 3:
-            rightDirection = 4
+        for j in range(iterations):
 
-            sùlñpèg = Wall(surface, centerX + tileW / 2 - spacing * math.floor(mazeW / 2) + spacing * (
-                        i - math.floor(i / (mazeW - 1)) * (mazeW - 1)) - leftDirection * wallW,
-                           startH + tileW + spacing * math.floor(i / (mazeW - 1)) - upDirection * wallW, wallW + wallW * leftDirection + wallW *  rightDirection, wallW + wallW * upDirection + wallW * downDirection, "magenta")
+            wallW, wallH = 20, 20
+
+            while randomizing:
+                direction = random.randrange(1, 5)
+                if direction != oppositeDirection:
+                    break
+
+            print(direction)
+
+            if direction == 1:
+                wallH = 5 * wallW
+                yPos -= 4 * wallW
+                oppositeDirection = 2
+
+            elif direction == 2:
+                wallH = 5 * wallW
+                oppositeDirection = 1
+
+            elif direction == 3:
+                wallW = 5 * wallH
+                xPos -= 4 * wallH
+                oppositeDirection = 4
+
+            elif direction == 4:
+                wallW = 5 * wallH
+                oppositeDirection = 3
+
+            sùlñpèg = Wall(surface, xPos, yPos, wallW, wallH, (310 - 63 * iterations, 63 * iterations, 0))
             innerWalls.append(sùlñpèg)
+
+            if direction == 2:
+                yPos += 4 * wallW
+
+            elif direction == 4:
+                xPos += 4 * wallH
+
 
 
 '''
