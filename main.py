@@ -1,52 +1,239 @@
-# TODO: Basic setup and screen
+#_______________________________________________________________________________________________________________________
+#                       KARL, SOPHIA & AMANDA - EKSAMENSPROJEKT I PROGRAMMERING B 2024
+#_______________________________________________________________________________________________________________________
 
-# Import libraries
+# Import libraries/frameworks
 import math
-from random import randrange
-
+import random
+# from random import randrange
 import pygame
 from pygame import mixer
 from Classes import Tile
+from Classes import Player
+from Classes import Wall
+# from Classes import Button
 
+# Initializing frameworks/libraries
 pygame.init()
 mixer.init()
+
+# Program status variable
+Running = True
 
 # Set frames per second
 fps = 20
 timer = pygame.time.Clock()
 
-tileCount = 100
-countdown = tileCount + 10
+# Key variables - Player 1
+wKey = pygame.K_w
+sKey = pygame.K_s
+aKey = pygame.K_a
+dKey = pygame.K_d
+
+# Key variables - Player 2
+upKey = pygame.K_UP
+leftKey = pygame.K_LEFT
+rightKey = pygame.K_RIGHT
+downKey = pygame.K_DOWN
+
+tileW = 60
+wallW = 20
+
+boots = 1
+pickaxe = 2
+mask = 3
+dagger = 4
+
+# items = [boots, pickaxe, mask, dagger]
+# player1items, player2items = [], []
+
+#for item in items:
+#    lilbro = (items[item], False)
+#    player1items.append(lilbro)
+#    player2items.append(lilbro)
+
 
 # Set up game window
 screenWidth, screenHeight = pygame.display.Info().current_h, pygame.display.Info().current_h
+canvasWidth, canvasHeight = 1980, 1980
 gameWindow = pygame.display.set_mode([screenWidth, screenHeight])
-surface = pygame.Surface((1920, 1080))
+surface = pygame.Surface((canvasWidth, canvasHeight))
 pygame.display.set_caption('aMAZEing')
 
 # Define center coordinates
-centerX, centerY = screenWidth / 2, screenWidth / 2
-
-# Define pixel size
-# Format for new pixel size should be 320:180
-
-
-Running = True
+centerX, centerY = canvasWidth / 2, canvasHeight / 2
 
 # INSTANCES
+#_______________________________________________________________________________________________________________________
+
+level = 0
+
+
+def generateMaze():
+    global level, countdown
+
+    level += 1
+
+    tiles.clear()
+    outerWalls.clear()
+    innerWalls.clear()
+
+    findDimensions()
+    placeTiles(mazeW, mazeH)
+    placeOuterWalls(mazeW, mazeH)
+    placeInnerWalls(mazeW, mazeH)
+
+    countdown = 100
+
+
+def findDimensions():
+    global mazeW, mazeH
+    mazeW = random.randrange(3, 23)
+    mazeH = random.randrange(3, 23)
+    print(mazeW)
+    print(mazeH)
+    if mazeW % 2 == 0 or mazeH % 2 == 0:
+        print('error!')
+        findDimensions()
+
+
+
+startH = 80
+
+spacing = tileW + wallW
+
+# TODONE: Liste med tiles
+
+# Tiles instance
 tiles = []
-for i in range(tileCount):
-    peñoslgH = Tile(surface, centerX + 16 + 32 * i - math.floor(i/5) * 32 * 5, 100 + 32 * math.floor(i/5), 24, 24, "green", i)
-    tiles.append(peñoslgH)
 
-    peñoslgV = Tile(surface, centerX - 16 - 32 * i + math.floor(i/5) * 32 * 5, 100 + 32 * math.floor(i/5), 24, 24, "green", i)
-    tiles.append(peñoslgV)
-    print(peñoslgV.count)
+def placeTiles(mazeW, mazeH):
+    for i in range(mazeH * math.ceil(mazeW / 2)):
+        if i % math.ceil(mazeW/2) == 0:
+            peñoslgM = Tile(surface, centerX - tileW/2, startH + spacing * math.floor(i/math.ceil(mazeW/2)),
+                            tileW, tileW, "darkslategray4", i)
+            tiles.append(peñoslgM)
 
-    print(f'!!!!!! {i}')
+        else:
+            peñoslgH = Tile(surface,
+                            centerX - tileW/2 + spacing * (i - math.floor(i / math.ceil(mazeW/2)) * math.ceil(mazeW/2)),
+                            startH + spacing * math.floor(i/math.ceil(mazeW/2)), tileW, tileW, 'darkslategray4', i)
+            tiles.append(peñoslgH)
+
+            peñoslgV = Tile(surface,
+                            centerX - tileW/2 - spacing * (i - math.floor(i / math.ceil(mazeW / 2)) * math.ceil(mazeW / 2)),
+                            startH + spacing * math.floor(i / math.ceil(mazeW / 2)), tileW, tileW, 'darkslategray4', i)
+            tiles.append(peñoslgV)
 
 
-walls = []
+# Player instances
+player1 = Player(surface, 20, 20, 20, 20, "blue", 1)
+player2 = Player(surface, 50, 50, 20, 20, "red", 2)
+
+
+
+# TODONE : Create outer walls from Wall class
+
+outerWalls = []
+def placeOuterWalls(mazeW, mazeH):
+    leftWall = Wall(surface, centerX + tileW/2 - spacing * math.floor((mazeW + 2)/2),
+                   startH - wallW, wallW, mazeH * spacing + wallW, "magenta")
+    rightWall = Wall(surface, centerX - tileW / 2 - wallW + spacing * math.floor((mazeW + 2) / 2),
+                    startH - wallW, wallW, mazeH * spacing + wallW, "magenta")
+
+    leftUpperWall = Wall(surface, centerX + tileW/2 - spacing * math.floor((mazeW + 2)/2),
+                   startH - wallW, math.floor(mazeW/2) * spacing + wallW, wallW, "magenta")
+    rightUpperWall = Wall(surface, centerX + tileW/2,
+                   startH - wallW, math.floor(mazeW/2) * spacing + wallW, wallW, "magenta")
+
+    bottomWall = Wall(surface, centerX + tileW/2 - spacing * math.floor((mazeW + 2)/2),
+                   startH + mazeH * spacing - wallW, mazeW * spacing + wallW, wallW, "magenta")
+
+    outerWalls.append(leftWall)
+    outerWalls.append(rightWall)
+    outerWalls.append(leftUpperWall)
+    outerWalls.append(rightUpperWall)
+    outerWalls.append(bottomWall)
+
+
+
+# TODO : Create walls from Wall class
+
+# Wall instance
+innerWalls = []
+
+def placeInnerWalls(mazeW, mazeH):
+    randomizing = True
+
+    #for i in range(1):
+    for i in range((mazeW - 1) * (mazeH - 1)):
+
+        xPos = centerX + tileW / 2 - spacing * math.floor(mazeW / 2) + spacing * (
+                    i - math.floor(i / (mazeW - 1)) * (mazeW - 1))
+        yPos = startH + tileW + spacing * math.floor(i / (mazeW - 1))
+
+        iterations = random.randrange(1, 5)
+
+        oppositeDirection = None
+
+        for j in range(iterations):
+
+            wallW, wallH = 20, 20
+
+            while randomizing:
+                direction = random.randrange(1, 5)
+                if direction != oppositeDirection:
+                    break
+
+            print(direction)
+
+            if direction == 1:
+                wallH = 5 * wallW
+                yPos -= 4 * wallW
+                oppositeDirection = 2
+
+            elif direction == 2:
+                wallH = 5 * wallW
+                oppositeDirection = 1
+
+            elif direction == 3:
+                wallW = 5 * wallH
+                xPos -= 4 * wallH
+                oppositeDirection = 4
+
+            elif direction == 4:
+                wallW = 5 * wallH
+                oppositeDirection = 3
+
+            sùlñpèg = Wall(surface, xPos, yPos, wallW, wallH, (310 - 63 * iterations, 63 * iterations, 0))
+            innerWalls.append(sùlñpèg)
+
+            if direction == 2:
+                yPos += 4 * wallW
+
+            elif direction == 4:
+                xPos += 4 * wallH
+
+#############################
+### START PÅ RANDOM POINT ###
+#############################
+
+# https://www.geeksforgeeks.org/python-ways-to-shuffle-a-list/
+
+
+'''
+    for i in range((mazeW - 1) * (mazeH - 1)):
+        sùlñpèg = Wall(surface, centerX + tileW/2 - spacing * math.floor(mazeW/2) + spacing * (i - math.floor(i/(mazeW - 1)) * (mazeW - 1)),
+                       startH + tileW + spacing * math.floor(i/(mazeW - 1)), wallW, wallW, "magenta")
+        innerWalls.append(sùlñpèg)
+        num = random.randrange(3)
+        if num > 1:
+            sùlñpèg2 = Wall(surface, centerX + tileW / 2 - spacing * math.floor(mazeW / 2) + spacing * (
+                        i - math.floor(i / (mazeW - 1)) * (mazeW - 1)),
+                           startH + tileW + spacing * math.floor(i / (mazeW - 1)), wallW, wallW * 4, "magenta")
+            innerWalls.append(sùlñpèg2)
+'''
+
 
 
 
@@ -65,43 +252,6 @@ pygame.mixer.music.load(music)
 # mixer.music.load("")
 mixer.music.set_volume(0.2)
 
-def calculate_movement(movement_speed):
-    global w_moved, a_moved, s_moved, d_moved
-
-    key_pressed = pygame.key.get_pressed()
-
-    if key_pressed[pygame.K_w]:
-        w_moved = movement_speed
-
-    if key_pressed[pygame.K_a]:
-        a_moved = movement_speed
-
-    if key_pressed[pygame.K_s]:
-        s_moved = -movement_speed
-
-    if key_pressed[pygame.K_d]:
-        d_moved = -movement_speed
-
-    # The following code checks if a movement in the vertical direction and a movement in the horizontal direction
-    # both aren't equal to 0, meaning that there is diagonal movement. If so, both movement directions, making up
-    # the diagonal movement, is shortened, so that the diagonal movement speed is the same speed as vertical or
-    # horizontal movement
-    if w_moved and a_moved != 0:
-        w_moved = math.sin(45) * movement_speed
-        a_moved = math.sin(45) * movement_speed
-
-    if w_moved and d_moved != 0:
-        w_moved = math.sin(45) * movement_speed
-        d_moved = -math.sin(45) * movement_speed
-
-    if s_moved and a_moved != 0:
-        s_moved = -math.sin(45) * movement_speed
-        a_moved = math.sin(45) * movement_speed
-
-    if s_moved and d_moved != 0:
-        s_moved = -math.sin(45) * movement_speed
-        d_moved = -math.sin(45) * movement_speed
-
 
 def check_collisions(structure, player):
     global w_moved, a_moved, s_moved, d_moved
@@ -118,73 +268,68 @@ def check_collisions(structure, player):
             d_moved = 0
 
 
-
-
-TitleScreen = True
-Running = True
-
-
-for count in range(33):
-    timer.tick(15)
-    gameWindow.blit(introImages[count], (0, 0))
-    # Update game window
-    pygame.display.flip()
-
-while TitleScreen:
-    timer.tick(fps)
-
-    Customize_character = False
-    Options = False
-
-    gameWindow.blit(titleScreen, (0, 0))
-
-    # Check for pygame events
-    for event in pygame.event.get():
-
-        # Check for keys pressed
-        if event.type == pygame.KEYDOWN:
-
-            # Close game if escape key is pressed
-            if event.key == pygame.K_ESCAPE:
-                TitleScreen = False
-                # Running = False ##########################################################################
-
-        # Close game if the game windows close button is pressed
-        elif event.type == pygame.QUIT:
-            TitleScreen = False
-            Running = False
 # Playing music that repeats 69 times
 # Inspiration from:
 # https://stackoverflow.com/questions/35068209/how-do-i-repeat-music-using-pygame-mixer
 pygame.mixer.music.play(69)
-
 '''
 
-while Running:
+
+'''
+findDimensions()
+
+placeTiles(mazeW, mazeH)
+placeOuterWalls(mazeW, mazeH)
+placeInnerWalls(mazeW, mazeH)
+'''
+
+generateMaze()
+
+# ON THE WINDOW
+#_______________________________________________________________________________________________________________________
+running = True
+
+while running:
+    playMousePos = pygame.mouse.get_pos()
+
+    # Backgroundcolor for the game
+    surface.fill('darkslategrey')
+
     timer.tick(fps)
 
-    movementSpeed = 1
-    w_moved = 0
-    a_moved = 0
-    s_moved = 0
-    d_moved = 0
+    # Speed variables for the players
+    player1moveSpeed = 10
+    player2moveSpeed = 10
 
-    surface.fill('purple')
+    pygame.draw.rect(surface, 'black', pygame.Rect(0, 0, canvasWidth, canvasHeight),60)
 
     # BLITTING INSTANCES
+    # __________________________________________________________________________________________________________________
 
     for tile in tiles:
         tile.draw()
 
-    print(countdown)
+    for wall in outerWalls:
+        wall.draw()
 
-    countdown -= 1
+    for wall in innerWalls:
+        wall.draw()
+
+    # player1.move(wKey, aKey, sKey, dKey)
+    player1.move(wKey, sKey, aKey, dKey, player1moveSpeed)
+    player2.move(upKey, downKey, leftKey, rightKey, player2moveSpeed)
+
+    player1.draw()
+    player2.draw()
+
+    # print(countdown)
+
+    countdown -= 0.1 * level
 
     for i in range(2):
         for tile in tiles:
-            if tile.count == countdown:
+            if tile.count >= countdown:
                 tiles.remove(tile)
-
 
     # Check for pygame events
     for event in pygame.event.get():
@@ -193,160 +338,25 @@ while Running:
         if event.type == pygame.KEYDOWN:
             # Close game if escape key is pressed
             if event.key == pygame.K_ESCAPE:
-                Running = False
+                running = False
+
+            if event.key == pygame.K_SPACE:
+                generateMaze()
 
         # Close game if the game windows close button is pressed
         elif event.type == pygame.QUIT:
-            Running = False
+            running = False
 
-    '''
+        # Update game window
 
-    calculate_movement(movementSpeed)
-
-    for structure in structureHitboxes:
-        check_collisions(structure, player)
-
-    graveyardStructureTing.move(w_moved, a_moved, s_moved, d_moved)
-    graveyardStructureTing.draw()
-
-    for image in structures:
-        image.move(w_moved, a_moved, s_moved, d_moved)
-        image.draw()
-
-    for structure in structureHitboxes:
-        structure.move(w_moved, a_moved, s_moved, d_moved)
-        structure.update()
-
-    for border in borderHitboxes:
-        border.draw()
-
-    player.draw(px)
-
-    for attack in projectiles:
-        for monster in enemies:
-            player_attack(attack, monster)
-
-        if attack.pierce == 0:
-            projectiles.remove(attack)
-        attack.move(w_moved, a_moved, s_moved, d_moved)
-        attack.travel(centerX)
-        despawn_projectile(attack)
-        attack.draw()
-
-    for monster in enemies:
-        if monster.health <= 0:
-            enemies.remove(monster)
-            willpowerPoints += 1
-            pygame.mixer.Sound.play(killSound)
-        enemy_attack(monster, player)
-        monster.move(w_moved, a_moved, s_moved, d_moved)
-        monster.travel(centerX, centerY)
-        despawn_enemy(monster)
-        monster.draw(centerX, px)
-
-    # fog(temptationPoints)
-
-    # display_mouse_coordinates()
-
-    gameWindow.blit(HUD, (0, 0))
-
-    level_progression = 10 + willpowerLevel * 5
-    willpower_bar(willpowerPoints, willpowerLevel, level_progression)
-    if willpowerPoints >= level_progression:
-        willpowerLevel += 1
-        upgradePoints += 1
-        willpowerPoints = 0
-        pygame.mixer.Sound.play(levelUpSound)
-
-    temptation_graphics(temptationPoints)
-
-    HUD_graphics(upgradePoints)
-
-    if temptationPoints >= 100:
-
-        enemies.clear()
-
-        setbackTime = pygame.time.get_ticks()
-        Setback = True
-
-        while Setback:
-
-            # Check for pygame events
-            for event in pygame.event.get():
-
-                # Check for keys pressed
-                if event.type == pygame.KEYDOWN:
-
-                    # Close game if escape key is pressed
-                    if event.key == pygame.K_ESCAPE:
-                        Setback = False
-                        Running = False
-
-                    elif event.key == pygame.K_SPACE:
-                        Setback = False
-
-                # Close game if the game windows close button is pressed
-                elif event.type == pygame.QUIT:
-                    Setback = False
-                    Running = False
-
-            gameWindow.blit(setbackFrame, (0, 0))
-            timeSinceSetback = pygame.time.get_ticks() - setbackTime
-            setbackText3 = font4.render('get smoked', True, 'black')
-            setbackText = font3.render('get smoked', True, 'red')
-            setbackText2 = font3.render('time', True, 'black')
-            setbackTimer = font2.render(f'{10000 - timeSinceSetback}', True, 'red')
-            gameWindow.blit(setbackText3, (118 * px, 75 * px))
-            gameWindow.blit(setbackText, (120 * px, 75 * px))
-            gameWindow.blit(setbackText2, (120 * px, 95 * px))
-            gameWindow.blit(setbackTimer, (125 * px, 100 * px))
-
-            if timeSinceSetback >= 10000:
-                Setback = False
-
-            # Update game window
-            pygame.display.flip()
-
-        temptationPoints = 0
-        willpowerPoints = 0
-        willpowerLevel -= 3
-        if willpowerLevel < 0:
-            willpowerLevel = 0
-
-    if temptationPoints > 0:
-        timeSinceTemptation = pygame.time.get_ticks() - temptationTime
-        if timeSinceTemptation > 10000:
-            Regenerating = True
-
-    if Regenerating:
-        regenParameter = timeSinceTemptation / 1000 - 10
-        temptationPoints -= (regenParameter * regenParameter) / 50
-        print((regenParameter * regenParameter) / 50)
-
-
-
-    if temptationPoints < 0:
-        Regenerating = False
-        temptationPoints = 0
-
-
-    graphicsDelay -= 1
-
-    '''
-
-    # Update game window
-
-    # Mark Moment
-    display.blit(pygame.transform.scale(surface, (gameWindowWidth, gameWindowHeight)), (0, 0))
-    pygame.display.flip()
+        # Mark Moment
+        gameWindow.blit(pygame.transform.scale(surface, (screenHeight, screenHeight)), (0, 0))
+        pygame.display.flip()
 
 
 
 
 
-
-
-# TODO: Liste med tiles
 
 
 
