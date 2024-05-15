@@ -101,10 +101,10 @@ class Wall(GameObject):
         self.hitbox = pygame.Rect(self.x, self.y, self.w, self.h)
 
 
-# Fog klassen
-class Fog(GameObject):
-    def __init__(self, game_window, xPos, yPos, width, height, color):
-        super().__init__(game_window, xPos, yPos, width, height, color)
+# Fog klassen (ikke en del af MVP'en)
+#class Fog(GameObject):
+    #def __init__(self, game_window, xPos, yPos, width, height, color):
+        #super().__init__(game_window, xPos, yPos, width, height, color)
 
 
 # Item klassen
@@ -114,7 +114,7 @@ class Item(GameObject):
         self.name = name
         self.picked = pickedUp
 
-
+# Button klassen
 class Button:  # (credit: Coding With Russ YT)
     def __init__(self, game_window, xPos, yPos, image, scale):
         self.gw = game_window

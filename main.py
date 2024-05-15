@@ -5,7 +5,6 @@
 # Import libraries/frameworks
 import math
 import random
-# from random import randrange
 import pygame
 from pygame import mixer
 from Classes import Tile
@@ -52,9 +51,7 @@ pygame.display.set_caption('aMAZEing')
 centerX, centerY = canvasWidth / 2, canvasHeight / 2
 
 level = 0
-
 startH = 80
-
 spacing = tileW + wallW
 
 # Tile list
@@ -68,15 +65,23 @@ innerWalls = []
 player1 = Player(surface, 20, 20, 20, 20, "blue", 1)
 player2 = Player(surface, 50, 50, 20, 20, "red", 2)
 
+# Game status variables
 Running = True
-
 StartMenu = True
+PauseMenu = False
 
+backgroundImg = pygame.image.load("Sprites/BackgroundStartMenu.png").convert_alpha()
+backgroundImg = pygame.transform.scale(backgroundImg, (screenWidth, screenHeight))
+
+
+# Button instances
 startButtonImg = pygame.image.load("Sprites/StartButton.png").convert_alpha()
 exitButtonImg = pygame.image.load("Sprites/Exit.png").convert_alpha()
+resumeButtonImg = pygame.image.load("Sprites/ResumeButton.png").convert_alpha()
 
 startButton = Button(gameWindow, 320, 300, startButtonImg, 1.5)
 exitButton = Button(gameWindow, 320, 420, exitButtonImg, 1.5)
+resumeButton = Button(gameWindow, 320, 300, resumeButtonImg, 1.5)
 
 
 def generateMaze():
@@ -206,12 +211,7 @@ def placeInnerWalls(mazeW, mazeH):
 
 # https://www.geeksforgeeks.org/python-ways-to-shuffle-a-list/
 
-
 generateMaze()
-
-# ON THE WINDOW
-#_______________________________________________________________________________________________________________________
-
 
 while StartMenu:
 
@@ -222,14 +222,15 @@ while StartMenu:
             if event.key == pygame.K_ESCAPE:
                 StartMenu = False
                 Running = False
-            elif event.key == pygame.K_SPACE:
-                StartMenu = False
+                PauseMenu = False
+            #elif event.key == pygame.K_SPACE:
+                #StartMenu = False
         # Close game if the game windows close button is pressed
         elif event.type == pygame.QUIT:
             StartMenu = False
             Running = False
 
-    gameWindow.fill((10, 10, 10))
+    gameWindow.blit(backgroundImg, (0, 0))
 
     if startButton.draw():
         print("Klikket på start!!!")
@@ -256,10 +257,7 @@ while Running:
     player1moveSpeed = 5
     player2moveSpeed = 5
 
-    pygame.draw.rect(surface, 'black', pygame.Rect(0, 0, canvasWidth, canvasHeight),60)
-
-    # BLITTING INSTANCES
-    # __________________________________________________________________________________________________________________
+    pygame.draw.rect(surface, 'black', pygame.Rect(0, 0, canvasWidth, canvasHeight), 60)
 
     for tile in tiles:
         tile.draw()
@@ -302,6 +300,7 @@ while Running:
             # Close game if escape key is pressed
             if event.key == pygame.K_ESCAPE:
                 Running = False
+                PauseMenu = True
 
             if event.key == pygame.K_SPACE:
                 generateMaze()
@@ -317,7 +316,31 @@ while Running:
     pygame.display.flip()
 
 
+while PauseMenu:
 
+    for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                Running = True
+                PauseMenu = False
+                StartMenu = False
+            #elif event.key == pygame.K_SPACE:
+                #PauseMenu = False
+        #elif event.type == pygame.QUIT:
+            #Running = False
+            #PauseMenu = False
+
+    gameWindow.fill((10, 10, 10))
+
+    if resumeButton.draw():
+        print("Klikket resume!!!")
+        Running = True
+
+    if exitButton.draw():
+        print("Klikket exit!!!")
+        PauseMenu = False
+
+    pygame.display.flip()
 
 
 '''
@@ -325,7 +348,7 @@ while Running:
          XXXXXXXXXXXXXXXXXXXXX
       XXXXXX   XXXXXXXXX   XXXXXX
       XXXXXX   XXXXXXXXX   XXXXXX
-      XXXXXXXXXXXX   XXXXXXXXXXXX
+      XXXXXXXXXXXXXXXXXXXXXXXXXXX
       XXX   XXXXXXXXXXXXXXX   XXX
       XXXXXX   XXXXXXXXX   XXXXXX
          XXXXXX         XXXXXX
