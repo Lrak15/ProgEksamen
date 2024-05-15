@@ -11,17 +11,14 @@ from pygame import mixer
 from Classes import Tile
 from Classes import Player
 from Classes import Wall
-# from Classes import Button
+from Classes import Button
 
 # Initializing frameworks/libraries
 pygame.init()
 mixer.init()
 
-# Program status variable
-Running = True
-
 # Set frames per second
-fps = 20
+fps = 69
 timer = pygame.time.Clock()
 
 # Key variables - Player 1
@@ -44,15 +41,6 @@ pickaxe = 2
 mask = 3
 dagger = 4
 
-# items = [boots, pickaxe, mask, dagger]
-# player1items, player2items = [], []
-
-#for item in items:
-#    lilbro = (items[item], False)
-#    player1items.append(lilbro)
-#    player2items.append(lilbro)
-
-
 # Set up game window
 screenWidth, screenHeight = pygame.display.Info().current_h, pygame.display.Info().current_h
 canvasWidth, canvasHeight = 1980, 1980
@@ -63,10 +51,32 @@ pygame.display.set_caption('aMAZEing')
 # Define center coordinates
 centerX, centerY = canvasWidth / 2, canvasHeight / 2
 
-# INSTANCES
-#_______________________________________________________________________________________________________________________
-
 level = 0
+
+startH = 80
+
+spacing = tileW + wallW
+
+# Tile list
+tiles = []
+
+# Wall lists
+outerWalls = []
+innerWalls = []
+
+# Player instances
+player1 = Player(surface, 20, 20, 20, 20, "blue", 1)
+player2 = Player(surface, 50, 50, 20, 20, "red", 2)
+
+Running = True
+
+StartMenu = True
+
+startButtonImg = pygame.image.load("Sprites/StartButton.png").convert_alpha()
+exitButtonImg = pygame.image.load("Sprites/Exit.png").convert_alpha()
+
+startButton = Button(gameWindow, 320, 300, startButtonImg, 1.5)
+exitButton = Button(gameWindow, 320, 420, exitButtonImg, 1.5)
 
 
 def generateMaze():
@@ -83,29 +93,20 @@ def generateMaze():
     placeOuterWalls(mazeW, mazeH)
     placeInnerWalls(mazeW, mazeH)
 
-    countdown = 100
+    countdown = math.ceil(mazeW/2) * mazeH
+    print(countdown)
 
 
 def findDimensions():
     global mazeW, mazeH
-    mazeW = random.randrange(3, 23)
-    mazeH = random.randrange(3, 23)
+    mazeW = random.randrange(2 + level, 5 + 2 * level)
+    mazeH = random.randrange(2 + level, 5 + 2 * level)
     print(mazeW)
     print(mazeH)
     if mazeW % 2 == 0 or mazeH % 2 == 0:
         print('error!')
         findDimensions()
 
-
-
-startH = 80
-
-spacing = tileW + wallW
-
-# TODONE: Liste med tiles
-
-# Tiles instance
-tiles = []
 
 def placeTiles(mazeW, mazeH):
     for i in range(mazeH * math.ceil(mazeW / 2)):
@@ -126,15 +127,6 @@ def placeTiles(mazeW, mazeH):
             tiles.append(peñoslgV)
 
 
-# Player instances
-player1 = Player(surface, 20, 20, 20, 20, "blue", 1)
-player2 = Player(surface, 50, 50, 20, 20, "red", 2)
-
-
-
-# TODONE : Create outer walls from Wall class
-
-outerWalls = []
 def placeOuterWalls(mazeW, mazeH):
     leftWall = Wall(surface, centerX + tileW/2 - spacing * math.floor((mazeW + 2)/2),
                    startH - wallW, wallW, mazeH * spacing + wallW, "magenta")
@@ -155,12 +147,6 @@ def placeOuterWalls(mazeW, mazeH):
     outerWalls.append(rightUpperWall)
     outerWalls.append(bottomWall)
 
-
-
-# TODO : Create walls from Wall class
-
-# Wall instance
-innerWalls = []
 
 def placeInnerWalls(mazeW, mazeH):
     randomizing = True
@@ -221,75 +207,44 @@ def placeInnerWalls(mazeW, mazeH):
 # https://www.geeksforgeeks.org/python-ways-to-shuffle-a-list/
 
 
-'''
-    for i in range((mazeW - 1) * (mazeH - 1)):
-        sùlñpèg = Wall(surface, centerX + tileW/2 - spacing * math.floor(mazeW/2) + spacing * (i - math.floor(i/(mazeW - 1)) * (mazeW - 1)),
-                       startH + tileW + spacing * math.floor(i/(mazeW - 1)), wallW, wallW, "magenta")
-        innerWalls.append(sùlñpèg)
-        num = random.randrange(3)
-        if num > 1:
-            sùlñpèg2 = Wall(surface, centerX + tileW / 2 - spacing * math.floor(mazeW / 2) + spacing * (
-                        i - math.floor(i / (mazeW - 1)) * (mazeW - 1)),
-                           startH + tileW + spacing * math.floor(i / (mazeW - 1)), wallW, wallW * 4, "magenta")
-            innerWalls.append(sùlñpèg2)
-'''
-
-
-
-
-
-'''
-# Load sounds
-# Inspiration from:
-# https://stackoverflow.com/questions/65247656/how-do-i-change-the-volume-of-the-sound-or-music-in-pygame
-
-shootSound = pygame.mixer.Sound("Sfx/shootsound.mp3")
-shootSound.set_volume(0.2)
-
-music = 'Sfx/Amynedd Main Theme SMT-2 0.8S.mp3'
-pygame.mixer.music.load(music)
-
-# mixer.music.load("")
-mixer.music.set_volume(0.2)
-
-
-def check_collisions(structure, player):
-    global w_moved, a_moved, s_moved, d_moved
-    collision_tolerance = 10 * px
-    if structure.hitbox.colliderect(player.hitbox):
-        print('collision')
-        if abs(player.hitbox.top - structure.hitbox.bottom) < collision_tolerance:
-            w_moved = 0
-        if abs(player.hitbox.left - structure.hitbox.right) < collision_tolerance:
-            a_moved = 0
-        if abs(player.hitbox.bottom - structure.hitbox.top) < collision_tolerance:
-            s_moved = 0
-        if abs(player.hitbox.right - structure.hitbox.left) < collision_tolerance:
-            d_moved = 0
-
-
-# Playing music that repeats 69 times
-# Inspiration from:
-# https://stackoverflow.com/questions/35068209/how-do-i-repeat-music-using-pygame-mixer
-pygame.mixer.music.play(69)
-'''
-
-
-'''
-findDimensions()
-
-placeTiles(mazeW, mazeH)
-placeOuterWalls(mazeW, mazeH)
-placeInnerWalls(mazeW, mazeH)
-'''
-
 generateMaze()
 
 # ON THE WINDOW
 #_______________________________________________________________________________________________________________________
-running = True
 
-while running:
+
+while StartMenu:
+
+    for event in pygame.event.get():
+        # Check for keys pressed
+        if event.type == pygame.KEYDOWN:
+            # Close game if escape key is pressed
+            if event.key == pygame.K_ESCAPE:
+                StartMenu = False
+                Running = False
+            elif event.key == pygame.K_SPACE:
+                StartMenu = False
+        # Close game if the game windows close button is pressed
+        elif event.type == pygame.QUIT:
+            StartMenu = False
+            Running = False
+
+    gameWindow.fill((10, 10, 10))
+
+    if startButton.draw():
+        print("Klikket på start!!!")
+        StartMenu = False
+
+    if exitButton.draw():
+        print("Klikket på exit!!!")
+        StartMenu = False
+        Running = False
+
+    pygame.display.flip()
+
+
+while Running:
+
     playMousePos = pygame.mouse.get_pos()
 
     # Backgroundcolor for the game
@@ -298,8 +253,8 @@ while running:
     timer.tick(fps)
 
     # Speed variables for the players
-    player1moveSpeed = 10
-    player2moveSpeed = 10
+    player1moveSpeed = 5
+    player2moveSpeed = 5
 
     pygame.draw.rect(surface, 'black', pygame.Rect(0, 0, canvasWidth, canvasHeight),60)
 
@@ -315,7 +270,14 @@ while running:
     for wall in innerWalls:
         wall.draw()
 
-    # player1.move(wKey, aKey, sKey, dKey)
+    for object in outerWalls:
+        player1.check_collision(object)
+        player2.check_collision(object)
+
+    for object in innerWalls:
+        player1.check_collision(object)
+        player2.check_collision(object)
+
     player1.move(wKey, sKey, aKey, dKey, player1moveSpeed)
     player2.move(upKey, downKey, leftKey, rightKey, player2moveSpeed)
 
@@ -324,7 +286,7 @@ while running:
 
     # print(countdown)
 
-    countdown -= 0.1 * level
+    countdown -= 0.03 + 0.01 * level
 
     for i in range(2):
         for tile in tiles:
@@ -338,46 +300,20 @@ while running:
         if event.type == pygame.KEYDOWN:
             # Close game if escape key is pressed
             if event.key == pygame.K_ESCAPE:
-                running = False
+                Running = False
 
             if event.key == pygame.K_SPACE:
                 generateMaze()
 
         # Close game if the game windows close button is pressed
         elif event.type == pygame.QUIT:
-            running = False
+            Running = False
 
         # Update game window
 
-        # Mark Moment
-        gameWindow.blit(pygame.transform.scale(surface, (screenHeight, screenHeight)), (0, 0))
-        pygame.display.flip()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# TODO: Main loop
-
-
-
-
-
+    # Mark Moment
+    gameWindow.blit(pygame.transform.scale(surface, (screenHeight, screenHeight)), (0, 0))
+    pygame.display.flip()
 
 
 

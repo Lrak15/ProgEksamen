@@ -20,8 +20,29 @@ class GameObject:
 # Player klassen
 class Player(GameObject):
     def __init__(self, game_window, xPos, yPos, width, height, color, player):
-       super().__init__(game_window, xPos, yPos, width, height, color)
-       self.player = player
+        super().__init__(game_window, xPos, yPos, width, height, color)
+        self.player = player
+        self.topCollide = False
+        self.bottomCollide = False
+        self.leftCollide = False
+        self.rightCollide = False
+        self.hitbox = pygame.Rect(self.x, self.y, self.w, self.h)
+
+    def check_collision(self, object):
+
+        self.topCollide, self.bottomCollide, self.leftCollide, self.rightCollide = False, False, False, False
+
+        collision_tolerance = 10
+        if self.hitbox.colliderect(object.hitbox):
+            print('collision')
+            if abs(self.hitbox.top - object.hitbox.bottom) < collision_tolerance:
+                self.topCollide = True
+            elif abs(self.hitbox.bottom - object.hitbox.top) < collision_tolerance:
+                self.bottomCollide = True
+            if abs(self.hitbox.left - object.hitbox.right) < collision_tolerance:
+                self.leftCollide = True
+            elif abs(self.hitbox.right - object.hitbox.left) < collision_tolerance:
+                self.rightCollide = True
 
     def move(self, up, down, left, right, movespeed):
         up_moved = 0
@@ -30,13 +51,13 @@ class Player(GameObject):
         right_moved = 0
         key = pygame.key.get_pressed()
 
-        if key[up]:
+        if key[up] and not self.topCollide:
             up_moved = -movespeed
-        if key[down]:
+        if key[down] and not self.bottomCollide:
             down_moved = movespeed
-        if key[left]:
+        if key[left] and not self.leftCollide:
             left_moved = -movespeed
-        if key[right]:
+        if key[right] and not self.rightCollide:
             right_moved = movespeed
 
         if up_moved and left_moved != 0:
@@ -59,19 +80,6 @@ class Player(GameObject):
         self.y += up_moved + down_moved
 
 
-class Button:
-    def __init__(self, x, y, image, scaling):
-        width = image.get_width()
-        height = image.get_height()
-        self.image = image.transform.scale(image, (int(width * scaling), int(height * scaling)))
-        self.rect = self.image.get_rect()
-        self.rect.topleft = (x, y)
-
-    def drawButton(self):
-        surface.blit(self, (self.rect.x, self.rect.y))
-
-
-
 # Tile klassen
 class Tile(GameObject):
     def __init__(self, game_window, xPos, yPos, width, height, color, count):
@@ -83,6 +91,7 @@ class Tile(GameObject):
 class Wall(GameObject):
     def __init__(self, game_window, xPos, yPos, width, height, color):
         super().__init__(game_window, xPos, yPos, width, height, color)
+        self.hitbox = pygame.Rect(self.x, self.y, self.w, self.h)
 
 
 # Fog klassen
@@ -97,3 +106,29 @@ class Item(GameObject):
         super().__init__(game_window, xPos, yPos, width, height, color)
         self.name = name
         self.picked = pickedUp
+
+
+class Button:  # (credit: Coding With Russ YT)
+    def __init__(self, game_window, xPos, yPos, image, scale):
+        self.gw = game_window
+        width = image.get_width()
+        height = image.get_height()
+        self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
+        self.rect = self.image.get_rect(topleft=(xPos, yPos))
+        self.clicked = False
+
+    def draw(self):
+        action = False
+        pos = pygame.mouse.get_pos()
+
+        if self.rect.collidepoint(pos):
+            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                self.clicked = True
+                action = True
+
+        if pygame.mouse.get_pressed()[0] == 0:
+            self.clicked = False
+
+        self.gw.blit(self.image, self.rect)
+
+        return action
