@@ -12,6 +12,7 @@ class GameObject:
         self.w = width
         self.h = height
         self.color = color
+        self.hitbox = pygame.Rect(self.x, self.y, self.w, self.h)
 
     def draw(self):
         pygame.draw.rect(self.gw, self.color, pygame.Rect(self.x, self.y, self.w, self.h))
@@ -26,23 +27,29 @@ class Player(GameObject):
         self.bottomCollide = False
         self.leftCollide = False
         self.rightCollide = False
-        self.hitbox = pygame.Rect(self.x, self.y, self.w, self.h)
 
-    def check_collision(self, object):
+    def checkCollision(self, object):
+
+        self.hitbox = pygame.Rect(self.x, self.y, self.w, self.h)
 
         self.topCollide, self.bottomCollide, self.leftCollide, self.rightCollide = False, False, False, False
 
-        collision_tolerance = 10
+        collisionTolerance = 10
+
         if self.hitbox.colliderect(object.hitbox):
             print('collision')
-            if abs(self.hitbox.top - object.hitbox.bottom) < collision_tolerance:
+            if abs(self.hitbox.top - object.hitbox.bottom) < collisionTolerance:
                 self.topCollide = True
-            elif abs(self.hitbox.bottom - object.hitbox.top) < collision_tolerance:
+                print('top collision')
+            elif abs(self.hitbox.bottom - object.hitbox.top) < collisionTolerance:
                 self.bottomCollide = True
-            if abs(self.hitbox.left - object.hitbox.right) < collision_tolerance:
+                print('bottom collision')
+            if abs(self.hitbox.left - object.hitbox.right) < collisionTolerance:
                 self.leftCollide = True
-            elif abs(self.hitbox.right - object.hitbox.left) < collision_tolerance:
+                print('left collision')
+            elif abs(self.hitbox.right - object.hitbox.left) < collisionTolerance:
                 self.rightCollide = True
+                print('right collision')
 
     def move(self, up, down, left, right, movespeed):
         up_moved = 0

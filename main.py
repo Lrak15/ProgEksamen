@@ -158,7 +158,7 @@ def placeInnerWalls(mazeW, mazeH):
                     i - math.floor(i / (mazeW - 1)) * (mazeW - 1))
         yPos = startH + tileW + spacing * math.floor(i / (mazeW - 1))
 
-        iterations = random.randrange(1, 5)
+        iterations = random.randrange(1, 4)
 
         oppositeDirection = None
 
@@ -270,21 +270,22 @@ while Running:
     for wall in innerWalls:
         wall.draw()
 
-    for object in outerWalls:
-        player1.check_collision(object)
-        player2.check_collision(object)
-
-    for object in innerWalls:
-        player1.check_collision(object)
-        player2.check_collision(object)
-
     player1.move(wKey, sKey, aKey, dKey, player1moveSpeed)
     player2.move(upKey, downKey, leftKey, rightKey, player2moveSpeed)
 
     player1.draw()
     player2.draw()
 
-    # print(countdown)
+    for object in outerWalls:
+        player1.checkCollision(object)
+        player2.checkCollision(object)
+
+    for object in innerWalls:
+        player1.checkCollision(object)
+        player2.checkCollision(object)
+
+    player1.checkCollision(player2)
+    player2.checkCollision(player1)
 
     countdown -= 0.03 + 0.01 * level
 
