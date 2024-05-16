@@ -70,10 +70,6 @@ Running = True
 StartMenu = True
 PauseMenu = False
 
-# Player instances
-player1 = Player(surface, 20, 20, 20, 20, "blue", 1)
-player2 = Player(surface, 50, 50, 20, 20, "red", 2)
-
 # Loading background image and scaling it
 backgroundImg = pygame.image.load("Sprites/BackgroundStartMenu.png").convert_alpha()
 backgroundImg = pygame.transform.scale(backgroundImg, (screenWidth - screenHeight / 5, screenHeight - screenHeight / 5))
@@ -93,7 +89,7 @@ resumeButton = Button(gameWindow, centerButtonX, 300, resumeButtonImg, 1.5)
 
 # Generate maze function
 def generateMaze():
-    global level, countdown
+    global level, countdown, player1, player2
 
     level += 1
 
@@ -102,12 +98,17 @@ def generateMaze():
     innerWalls.clear()
 
     findDimensions()
-    placeTiles(mazeW, mazeH)
-    placeOuterWalls(mazeW, mazeH)
-    placeInnerWalls(mazeW, mazeH)
+    placeFloor()
+    placeTiles()
+    placeOuterWalls()
+    placeInnerWalls()
 
-    countdown = math.ceil(mazeW/2) * mazeH
+    countdown = math.ceil(mazeW/2) * mazeH + 10
     print(countdown)
+
+    # Player instances
+    player1 = Player(surface, centerX - math.floor(mazeW/2) * spacing - wallW/2, mazeH * spacing + wallW, 20, 20, "blue", 1)
+    player2 = Player(surface,  centerX + math.floor(mazeW/2) * spacing - wallW/2, mazeH * spacing + wallW, 20, 20, "red", 2)
 
 
 # FindDimensions function
@@ -124,8 +125,29 @@ def findDimensions():
         findDimensions()
 
 
+# Floor function
+def placeFloor():
+
+    for i in range(mazeH * math.ceil(mazeW / 2)):
+        if i % math.ceil(mazeW/2) == 0:
+            floorM = Tile(surface, centerX - tileW/2 - wallW, startH + spacing * math.floor(i/math.ceil(mazeW/2)) - wallW,
+                            tileW + 2 * wallW, tileW + 2 * wallW, "darkslategray", i)
+            tiles.append(floorM)
+        else:
+            floorH = Tile(surface,
+                            centerX - tileW/2 + spacing * (i - math.floor(i / math.ceil(mazeW/2)) * math.ceil(mazeW/2)) - wallW,
+                            startH + spacing * math.floor(i/math.ceil(mazeW/2)) - wallW, tileW + 2 * wallW, tileW + 2 * wallW, 'darkslategray', i)
+            tiles.append(floorH)
+
+            floorV = Tile(surface,
+                            centerX - tileW/2 - spacing * (i - math.floor(i / math.ceil(mazeW / 2)) * math.ceil(mazeW / 2)) - wallW,
+                            startH + spacing * math.floor(i / math.ceil(mazeW / 2)) - wallW, tileW + 2 * wallW, tileW + 2 * wallW, 'darkslategray', i)
+            tiles.append(floorV)
+
+
+
 # Place tiles function
-def placeTiles(mazeW, mazeH):
+def placeTiles():
     for i in range(mazeH * math.ceil(mazeW / 2)):
         if i % math.ceil(mazeW/2) == 0:
             peñoslgM = Tile(surface, centerX - tileW/2, startH + spacing * math.floor(i/math.ceil(mazeW/2)),
@@ -144,7 +166,7 @@ def placeTiles(mazeW, mazeH):
 
 
 # Place outer walls function
-def placeOuterWalls(mazeW, mazeH):
+def placeOuterWalls():
     leftWall = Wall(surface, centerX + tileW/2 - spacing * math.floor((mazeW + 2)/2),
                    startH - wallW, wallW, mazeH * spacing + wallW, "magenta")
     rightWall = Wall(surface, centerX - tileW / 2 - wallW + spacing * math.floor((mazeW + 2) / 2),
@@ -165,7 +187,7 @@ def placeOuterWalls(mazeW, mazeH):
     outerWalls.append(bottomWall)
 
 # Place inner walls function
-def placeInnerWalls(mazeW, mazeH):
+def placeInnerWalls():
     randomizing = True
 
     #for i in range(1):
@@ -214,9 +236,9 @@ def placeInnerWalls(mazeW, mazeH):
             elif direction == 4:
                 xPos += 4 * wallH
 
-#############################
-### START PÅ RANDOM POINT ###
-#############################
+                                #############################
+                                ### START PÅ RANDOM POINT ###
+                                #############################
 
 # https://www.geeksforgeeks.org/python-ways-to-shuffle-a-list/
 
@@ -261,7 +283,7 @@ while Running:
     playMousePos = pygame.mouse.get_pos()
 
     # Backgroundcolor for the game
-    surface.fill('darkslategrey')
+    surface.fill('black')
 
     timer.tick(fps)
 
