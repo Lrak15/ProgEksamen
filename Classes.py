@@ -27,25 +27,26 @@ class Player(GameObject):
         self.bottomCollide = False
         self.leftCollide = False
         self.rightCollide = False
+        self.escaped = False
+        self.fall = False
 
     def checkCollision(self, object):
         self.hitbox = pygame.Rect(self.x, self.y, self.w, self.h)
         collisionTolerance = 10
 
         if self.hitbox.colliderect(object.hitbox):
-            print('collision')
             if abs(self.hitbox.top - object.hitbox.bottom) < collisionTolerance:
                 self.topCollide = True
-                print('top collision')
             elif abs(self.hitbox.bottom - object.hitbox.top) < collisionTolerance:
                 self.bottomCollide = True
-                print('bottom collision')
             if abs(self.hitbox.left - object.hitbox.right) < collisionTolerance:
                 self.leftCollide = True
-                print('left collision')
             elif abs(self.hitbox.right - object.hitbox.left) < collisionTolerance:
                 self.rightCollide = True
-                print('right collision')
+
+    def checkDeath(self, object):
+        self.collide = self.hitbox.colliderect(object.hitbox)
+
 
     def move(self, up, down, left, right, movespeed):
         up_moved = 0
