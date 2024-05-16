@@ -29,11 +29,7 @@ class Player(GameObject):
         self.rightCollide = False
 
     def checkCollision(self, object):
-
         self.hitbox = pygame.Rect(self.x, self.y, self.w, self.h)
-
-        self.topCollide, self.bottomCollide, self.leftCollide, self.rightCollide = False, False, False, False
-
         collisionTolerance = 10
 
         if self.hitbox.colliderect(object.hitbox):
@@ -86,6 +82,8 @@ class Player(GameObject):
         self.x += left_moved + right_moved
         self.y += up_moved + down_moved
 
+        self.topCollide, self.bottomCollide, self.leftCollide, self.rightCollide = False, False, False, False
+
 
 # Tile klassen
 class Tile(GameObject):
@@ -115,13 +113,15 @@ class Item(GameObject):
         self.picked = pickedUp
 
 # Button klassen
-class Button:  # (credit: Coding With Russ YT)
-    def __init__(self, game_window, xPos, yPos, image, scale):
+class Button:   # (credit: Coding With Russ YT)
+    def __init__(self, game_window, centerX, centerY, image, scale):
         self.gw = game_window
         width = image.get_width()
         height = image.get_height()
-        self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
-        self.rect = self.image.get_rect(topleft=(xPos, yPos))
+        scaled_width = int(width * scale)
+        scaled_height = int(height * scale)
+        self.image = pygame.transform.scale(image, (scaled_width, scaled_height))
+        self.rect = self.image.get_rect(center=(centerX, centerY))
         self.clicked = False
 
     def draw(self):
@@ -129,7 +129,7 @@ class Button:  # (credit: Coding With Russ YT)
         pos = pygame.mouse.get_pos()
 
         if self.rect.collidepoint(pos):
-            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+            if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
                 self.clicked = True
                 action = True
 

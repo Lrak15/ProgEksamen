@@ -1,6 +1,6 @@
-#_______________________________________________________________________________________________________________________
-#                       KARL, SOPHIA & AMANDA - EKSAMENSPROJEKT I PROGRAMMERING B 2024
-#_______________________________________________________________________________________________________________________
+########################################################################################################################
+#                       KARL, SOPHIA & AMANDA - EKSAMENSPROJEKT I PROGRAMMERING B 2024                                 #
+########################################################################################################################
 
 # Import libraries/frameworks
 import math
@@ -11,6 +11,7 @@ from Classes import Tile
 from Classes import Player
 from Classes import Wall
 from Classes import Button
+from Classes import Item
 
 # Initializing frameworks/libraries
 pygame.init()
@@ -32,24 +33,27 @@ leftKey = pygame.K_LEFT
 rightKey = pygame.K_RIGHT
 downKey = pygame.K_DOWN
 
+# Speed variables for the players
+player1moveSpeed = 3
+player2moveSpeed = 3
+
+# Tile and wall width variables
 tileW = 60
 wallW = 20
 
-boots = 1
-pickaxe = 2
-mask = 3
-dagger = 4
-
 # Set up game window
 screenWidth, screenHeight = pygame.display.Info().current_h, pygame.display.Info().current_h
-canvasWidth, canvasHeight = 1980, 1980
-gameWindow = pygame.display.set_mode([screenWidth, screenHeight])
+canvasWidth, canvasHeight = 1980, 1980  # Spillets størrelse
+menuWidth, menuHeight = 700, 700    # Menuernes størrelse
+gameWindow = pygame.display.set_mode([screenWidth - screenHeight / 5, screenHeight - screenHeight / 5])
 surface = pygame.Surface((canvasWidth, canvasHeight))
-pygame.display.set_caption('aMAZEing')
+pygame.display.set_caption('aMAZEing')  # Sætter spillets navn
 
 # Define center coordinates
 centerX, centerY = canvasWidth / 2, canvasHeight / 2
+centerButtonX, centerButtonY = 700 / 2, 700 / 2
 
+# Important global variables
 level = 0
 startH = 80
 spacing = tileW + wallW
@@ -61,29 +65,33 @@ tiles = []
 outerWalls = []
 innerWalls = []
 
-# Player instances
-player1 = Player(surface, 20, 20, 20, 20, "blue", 1)
-player2 = Player(surface, 50, 50, 20, 20, "red", 2)
-
 # Game status variables
 Running = True
 StartMenu = True
 PauseMenu = False
 
+# Player instances
+player1 = Player(surface, 20, 20, 20, 20, "blue", 1)
+player2 = Player(surface, 50, 50, 20, 20, "red", 2)
+
+# Loading background image and scaling it
 backgroundImg = pygame.image.load("Sprites/BackgroundStartMenu.png").convert_alpha()
-backgroundImg = pygame.transform.scale(backgroundImg, (screenWidth, screenHeight))
+backgroundImg = pygame.transform.scale(backgroundImg, (screenWidth - screenHeight / 5, screenHeight - screenHeight / 5))
 
-
-# Button instances
+# Loading button images
 startButtonImg = pygame.image.load("Sprites/StartButton.png").convert_alpha()
+rulesButtonImg = pygame.image.load("Sprites/Rules Button.png").convert_alpha()
 exitButtonImg = pygame.image.load("Sprites/Exit.png").convert_alpha()
 resumeButtonImg = pygame.image.load("Sprites/ResumeButton.png").convert_alpha()
 
-startButton = Button(gameWindow, 320, 300, startButtonImg, 1.5)
-exitButton = Button(gameWindow, 320, 420, exitButtonImg, 1.5)
-resumeButton = Button(gameWindow, 320, 300, resumeButtonImg, 1.5)
+# Button instances
+startButton = Button(gameWindow, centerButtonX, 280, startButtonImg, 1.5)
+rulesButton = Button(gameWindow, centerButtonX, 390, rulesButtonImg, 1.5)
+exitButton = Button(gameWindow, centerButtonX, 500, exitButtonImg, 1.5)
+exitButtonPauseMenu = Button(gameWindow, centerButtonX, 410, exitButtonImg, 1.5)
+resumeButton = Button(gameWindow, centerButtonX, 300, resumeButtonImg, 1.5)
 
-
+# Generate maze function
 def generateMaze():
     global level, countdown
 
@@ -102,24 +110,27 @@ def generateMaze():
     print(countdown)
 
 
+# FindDimensions function
 def findDimensions():
     global mazeW, mazeH
-    mazeW = random.randrange(2 + level, 5 + 2 * level)
-    mazeH = random.randrange(2 + level, 5 + 2 * level)
+
+    mazeW = random.randrange(2 + level, 5 + level)
+    mazeH = random.randrange(2 + level, 5 + level)
     print(mazeW)
     print(mazeH)
+
     if mazeW % 2 == 0 or mazeH % 2 == 0:
         print('error!')
         findDimensions()
 
 
+# Place tiles function
 def placeTiles(mazeW, mazeH):
     for i in range(mazeH * math.ceil(mazeW / 2)):
         if i % math.ceil(mazeW/2) == 0:
             peñoslgM = Tile(surface, centerX - tileW/2, startH + spacing * math.floor(i/math.ceil(mazeW/2)),
                             tileW, tileW, "darkslategray4", i)
             tiles.append(peñoslgM)
-
         else:
             peñoslgH = Tile(surface,
                             centerX - tileW/2 + spacing * (i - math.floor(i / math.ceil(mazeW/2)) * math.ceil(mazeW/2)),
@@ -132,6 +143,7 @@ def placeTiles(mazeW, mazeH):
             tiles.append(peñoslgV)
 
 
+# Place outer walls function
 def placeOuterWalls(mazeW, mazeH):
     leftWall = Wall(surface, centerX + tileW/2 - spacing * math.floor((mazeW + 2)/2),
                    startH - wallW, wallW, mazeH * spacing + wallW, "magenta")
@@ -152,23 +164,20 @@ def placeOuterWalls(mazeW, mazeH):
     outerWalls.append(rightUpperWall)
     outerWalls.append(bottomWall)
 
-
+# Place inner walls function
 def placeInnerWalls(mazeW, mazeH):
     randomizing = True
 
     #for i in range(1):
     for i in range((mazeW - 1) * (mazeH - 1)):
-
         xPos = centerX + tileW / 2 - spacing * math.floor(mazeW / 2) + spacing * (
                     i - math.floor(i / (mazeW - 1)) * (mazeW - 1))
         yPos = startH + tileW + spacing * math.floor(i / (mazeW - 1))
 
         iterations = random.randrange(1, 4)
-
         oppositeDirection = None
 
         for j in range(iterations):
-
             wallW, wallH = 20, 20
 
             while randomizing:
@@ -213,8 +222,8 @@ def placeInnerWalls(mazeW, mazeH):
 
 generateMaze()
 
+# Things happening while startmenu is equal to true
 while StartMenu:
-
     for event in pygame.event.get():
         # Check for keys pressed
         if event.type == pygame.KEYDOWN:
@@ -223,8 +232,8 @@ while StartMenu:
                 StartMenu = False
                 Running = False
                 PauseMenu = False
-            #elif event.key == pygame.K_SPACE:
-                #StartMenu = False
+            elif event.key == pygame.K_SPACE:
+                StartMenu = False
         # Close game if the game windows close button is pressed
         elif event.type == pygame.QUIT:
             StartMenu = False
@@ -236,6 +245,9 @@ while StartMenu:
         print("Klikket på start!!!")
         StartMenu = False
 
+    if rulesButton.draw():
+        print("Klikket på rules!!!")
+
     if exitButton.draw():
         print("Klikket på exit!!!")
         StartMenu = False
@@ -244,18 +256,14 @@ while StartMenu:
     pygame.display.flip()
 
 
+# Things happening while running is equal to true
 while Running:
-
     playMousePos = pygame.mouse.get_pos()
 
     # Backgroundcolor for the game
     surface.fill('darkslategrey')
 
     timer.tick(fps)
-
-    # Speed variables for the players
-    player1moveSpeed = 5
-    player2moveSpeed = 5
 
     pygame.draw.rect(surface, 'black', pygame.Rect(0, 0, canvasWidth, canvasHeight), 60)
 
@@ -312,23 +320,27 @@ while Running:
         # Update game window
 
     # Mark Moment
-    gameWindow.blit(pygame.transform.scale(surface, (screenHeight, screenHeight)), (0, 0))
+    gameWindow.blit(pygame.transform.scale(surface, (screenHeight - screenHeight / 5, screenHeight - screenHeight / 5)), (0, 0))
     pygame.display.flip()
 
 
+# Things happening while pausemenu is equal to true
 while PauseMenu:
-
     for event in pygame.event.get():
+        # Check for keys pressed
         if event.type == pygame.KEYDOWN:
+            # Close game if escape key is pressed
             if event.key == pygame.K_ESCAPE:
+                StartMenu = False
                 Running = True
                 PauseMenu = False
-                StartMenu = False
-            #elif event.key == pygame.K_SPACE:
-                #PauseMenu = False
-        #elif event.type == pygame.QUIT:
-            #Running = False
-            #PauseMenu = False
+            # elif event.key == pygame.K_SPACE:
+            # StartMenu = False
+        # Close game if the game windows close button is pressed
+        elif event.type == pygame.QUIT:
+            StartMenu = False
+            Running = True
+            PauseMenu = False
 
     gameWindow.fill((10, 10, 10))
 
@@ -336,7 +348,7 @@ while PauseMenu:
         print("Klikket resume!!!")
         Running = True
 
-    if exitButton.draw():
+    if exitButtonPauseMenu.draw():
         print("Klikket exit!!!")
         PauseMenu = False
 
@@ -354,5 +366,3 @@ while PauseMenu:
          XXXXXX         XXXXXX
                XXXXXXXXX
 '''
-
-
