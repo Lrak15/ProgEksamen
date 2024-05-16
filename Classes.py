@@ -28,7 +28,7 @@ class Player(GameObject):
         self.leftCollide = False
         self.rightCollide = False
         self.escaped = False
-        self.fall = False
+        self.OnTile = False
 
     def checkCollision(self, object):
         self.hitbox = pygame.Rect(self.x, self.y, self.w, self.h)
@@ -45,8 +45,8 @@ class Player(GameObject):
                 self.rightCollide = True
 
     def checkDeath(self, object):
-        self.collide = self.hitbox.colliderect(object.hitbox)
-
+        if self.hitbox.colliderect(object.hitbox):
+            self.OnTile = True
 
     def move(self, up, down, left, right, movespeed):
         up_moved = 0

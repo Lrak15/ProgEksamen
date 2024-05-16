@@ -94,6 +94,7 @@ def newLevel():
     global level, countdown, player1, player2
 
     tiles.clear()
+    floorTiles.clear()
     outerWalls.clear()
     innerWalls.clear()
 
@@ -258,6 +259,23 @@ def checkEscape():
     if player1.escaped == True and player2.escaped == True:
         newLevel()
 
+def checkWin():
+    player1.OnTile = False
+    player2.OnTile = False
+
+    for object in floorTiles:
+        player1.checkDeath(object)
+        player2.checkDeath(object)
+
+    if player1.OnTile:
+        print('yes1')
+
+    if player2.OnTile:
+        print('yes2')
+
+
+
+
 newLevel()
 
 # Things happening while startmenu is equal to true
@@ -320,11 +338,11 @@ while Running:
     #draw exit graphics
     pygame.draw.rect(surface, 'yellow', pygame.Rect(centerX - 3 * wallW / 2, startH - wallW, wallW * 3, wallW))
 
-    if not player1.escaped:
+    if player1.OnTile and not player1.escaped:
         player1.move(wKey, sKey, aKey, dKey, player1moveSpeed)
         player1.draw()
 
-    if not player2.escaped:
+    if player2.OnTile and not player2.escaped:
         player2.move(upKey, downKey, leftKey, rightKey, player2moveSpeed)
         player2.draw()
 
@@ -336,13 +354,6 @@ while Running:
         player1.checkCollision(object)
         player2.checkCollision(object)
 
-    for object in floorTiles:
-        player1.checkDeath(object)
-        player2.checkDeath(object)
-
-    if player2.collide:
-        print('death')
-
     countdown -= 0.01 + 0.005 * level
 
     for i in range(2):
@@ -353,6 +364,11 @@ while Running:
         for floor in floorTiles:
             if floor.count >= countdown:
                 floorTiles.remove(floor)
+
+    print(len(floorTiles))
+    print(len(tiles))
+
+    checkWin()
 
     checkEscape()
 
