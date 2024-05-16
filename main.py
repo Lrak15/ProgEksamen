@@ -66,11 +66,23 @@ floorTiles = []
 outerWalls = []
 innerWalls = []
 
-# Game status variables
+# Items list
+items = []
 
+# Game status variables
 Running = True
 StartMenu = True
 PauseMenu = False
+
+Player1Win = False
+Player2Win = False
+
+# Font
+font = pygame.font.Font('Aero.ttf', 250)
+
+# Text
+player1WinText = font.render('Player 1 Won', True, 'black')
+player2WinText = font.render('Player 2 Won', True, 'black')
 
 # Loading background image and scaling it
 backgroundImg = pygame.image.load("Sprites/BackgroundStartMenu.png").convert_alpha()
@@ -105,6 +117,13 @@ def newLevel():
     placeTiles()
     placeOuterWalls()
     placeInnerWalls()
+
+    for i in range(level):
+        itemX = random.randint(0, canvasWidth - 20)
+        itemY = random.randint(0, canvasWidth - 20)
+        item = Item(surface, itemX, itemY, 10, 10, "red", "boots", False)
+        items.append(item)
+
 
     countdown = math.ceil(mazeW/2) * mazeH + 5
     #(countdown)
@@ -200,7 +219,7 @@ def placeInnerWalls():
                     i - math.floor(i / (mazeW - 1)) * (mazeW - 1))
         yPos = startH + tileW + spacing * math.floor(i / (mazeW - 1))
 
-        iterations = random.randrange(1) # 1, 3
+        iterations = random.randrange(1, 3)
         oppositeDirection = None
 
         for j in range(iterations):
@@ -260,6 +279,8 @@ def checkEscape():
         newLevel()
 
 def checkWin():
+    global Player1Win, Player2Win
+
     player1.OnTile = False
     player2.OnTile = False
 
@@ -267,13 +288,11 @@ def checkWin():
         player1.checkDeath(object)
         player2.checkDeath(object)
 
-    if player1.OnTile:
-        print('yes1')
+    if not player1.OnTile:
+        Player2Win = True
 
-    if player2.OnTile:
-        print('yes2')
-
-
+    if not player2.OnTile:
+        Player1Win = True
 
 
 newLevel()
@@ -335,6 +354,9 @@ while Running:
     for wall in innerWalls:
         wall.draw()
 
+    for item in items:
+        item.draw()
+
     #draw exit graphics
     pygame.draw.rect(surface, 'yellow', pygame.Rect(centerX - 3 * wallW / 2, startH - wallW, wallW * 3, wallW))
 
@@ -392,6 +414,47 @@ while Running:
     # Mark Moment
     gameWindow.blit(pygame.transform.scale(surface, (screenHeight - screenHeight / 5, screenHeight - screenHeight / 5)), (0, 0))
     pygame.display.flip()
+
+    while Player1Win:
+        pygame.draw.rect(surface, 'orchid1', pygame.Rect(centerX - canvasWidth/2.2, centerY - canvasWidth/10, canvasWidth/1.1, canvasHeight/5))
+        surface.blit(player1WinText, (180, 900))
+
+        gameWindow.blit(pygame.transform.scale(surface, (screenHeight - screenHeight / 5, screenHeight - screenHeight / 5)), (0, 0))
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            # Check for keys pressed
+            if event.type == pygame.KEYDOWN:
+                # Close game if escape key is pressed
+                if event.key == pygame.K_ESCAPE:
+                    Running = False
+                    Player1Win = False
+            # Close game if the game windows close button is pressed
+            elif event.type == pygame.QUIT:
+                Running = False
+                Player1Win = False
+
+
+    while Player2Win:
+        pygame.draw.rect(surface, 'olivedrab1', pygame.Rect(centerX - canvasWidth / 2.2, centerY - canvasWidth / 10, canvasWidth / 1.1, canvasHeight / 5))
+        surface.blit(player2WinText, (150, 900))
+
+        gameWindow.blit(pygame.transform.scale(surface, (screenHeight - screenHeight / 5, screenHeight - screenHeight / 5)), (0, 0))
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            # Check for keys pressed
+            if event.type == pygame.KEYDOWN:
+                # Close game if escape key is pressed
+                if event.key == pygame.K_ESCAPE:
+                    Running = False
+                    Player2Win = False
+            # Close game if the game windows close button is pressed
+            elif event.type == pygame.QUIT:
+                Running = False
+                Player2Win = False
+
+
 
     # Things happening while pausemenu is equal to true
     while PauseMenu:
