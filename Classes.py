@@ -1,6 +1,8 @@
+# Import af libraries
 import math
 import pygame
 
+# Initialisering af Pygame
 pygame.init()
 
 # Game Object parent class
@@ -12,8 +14,9 @@ class GameObject:
         self.w = width
         self.h = height
         self.color = color
-        self.hitbox = pygame.Rect(self.x, self.y, self.w, self.h)
+        self.hitbox = pygame.Rect(self.x, self.y, self.w, self.h)   # Laver en hitbox ud fra spillerens dimensioner
 
+    # Metode der tegner spilleren i form af en rektangel
     def draw(self):
         pygame.draw.rect(self.gw, self.color, pygame.Rect(self.x, self.y, self.w, self.h))
 
@@ -30,10 +33,12 @@ class Player(GameObject):
         self.escaped = False
         self.OnTile = False
 
+    # Metode der tjekker om spillere kolliderer med et objekt
     def checkCollision(self, object):
         self.hitbox = pygame.Rect(self.x, self.y, self.w, self.h)
         collisionTolerance = 10
 
+        # Forskellige kollisionsscenarier
         if self.hitbox.colliderect(object.hitbox):
             if abs(self.hitbox.top - object.hitbox.bottom) < collisionTolerance:
                 self.topCollide = True
@@ -44,10 +49,12 @@ class Player(GameObject):
             elif abs(self.hitbox.right - object.hitbox.left) < collisionTolerance:
                 self.rightCollide = True
 
+    # Metode der tjekker om spilleren er død
     def checkDeath(self, object):
         if self.hitbox.colliderect(object.hitbox):
             self.OnTile = True
 
+    # Metode der tillader spilleren at kunne bevæge sig
     def move(self, up, down, left, right, movespeed):
         up_moved = 0
         down_moved = 0
@@ -55,6 +62,7 @@ class Player(GameObject):
         right_moved = 0
         key = pygame.key.get_pressed()
 
+        # Spilleren kan bevæge sig hvis ikke de er kollideret med et andet objekt
         if key[up] and not self.topCollide:
             up_moved = -movespeed
         if key[down] and not self.bottomCollide:
@@ -64,18 +72,16 @@ class Player(GameObject):
         if key[right] and not self.rightCollide:
             right_moved = movespeed
 
+        # Spilleren kan bevæge sig skråt vha. sinus
         if up_moved and left_moved != 0:
             up_moved = -math.sin(math.radians(45)) * movespeed
             left_moved = -math.sin(math.radians(45)) * movespeed
-
         if up_moved and right_moved != 0:
             up_moved = -math.sin(math.radians(45)) * movespeed
             right_moved = math.sin(math.radians(45)) * movespeed
-
         if down_moved and left_moved != 0:
             down_moved = math.sin(math.radians(45)) * movespeed
             left_moved = -math.sin(math.radians(45)) * movespeed
-
         if down_moved and right_moved != 0:
             down_moved = math.sin(math.radians(45)) * movespeed
             right_moved = math.sin(math.radians(45)) * movespeed
@@ -90,7 +96,7 @@ class Player(GameObject):
 class Tile(GameObject):
     def __init__(self, game_window, xPos, yPos, width, height, color, count):
         super().__init__(game_window, xPos, yPos, width, height, color)
-        self.count = count
+        self.count = count  # Indikere antallet af tiles
 
 
 # Wall klassen
@@ -110,33 +116,38 @@ class Wall(GameObject):
 class Item(GameObject):
     def __init__(self, game_window, xPos, yPos, width, height, color, name, pickedUp):
         super().__init__(game_window, xPos, yPos, width, height, color)
-        self.name = name
-        self.picked = pickedUp
+        self.name = name    # Navn på item
+        self.picked = pickedUp  # Bool der holder styr på om spilleren har samlet itemet op
 
 # Button klassen
 class Button:   # (credit: Coding With Russ YT)
     def __init__(self, game_window, centerX, centerY, image, scale):
         self.gw = game_window
-        width = image.get_width()
-        height = image.get_height()
-        scaled_width = int(width * scale)
-        scaled_height = int(height * scale)
-        self.image = pygame.transform.scale(image, (scaled_width, scaled_height))
+        width = image.get_width()       # Får billedets bredde
+        height = image.get_height()     # Får billedets højde
+        scaled_width = int(width * scale)       # Scaler bredden på billedet
+        scaled_height = int(height * scale)     # Scaler højden på billedet
+        self.image = pygame.transform.scale(image, (scaled_width, scaled_height))   # Scaler hele billedet
+        # Laver en rect ud fra billedet størrelse, og sætter dets anchor point til centrum
         self.rect = self.image.get_rect(center=(centerX, centerY))
-        self.clicked = False
+        self.clicked = False    # Knapperne er ALDRIG klikket på til at starte på
 
+    # Metode der tegner knapperne
     def draw(self):
         action = False
         pos = pygame.mouse.get_pos()
 
+        # Tjekker om spilleren trykker på knappen, mens pilen er derpå
         if self.rect.collidepoint(pos):
+            # Hvis der trykkes på knappen
             if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
                 self.clicked = True
                 action = True
-
+        # Hvis der ikke trykkes på knappen
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
 
+        # Tegner rent faktisk knappen på skærmen
         self.gw.blit(self.image, self.rect)
 
         return action
