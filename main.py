@@ -88,7 +88,6 @@ font = pygame.font.Font('Aero.ttf', 250)
 player1WinText = font.render('Player 1 Won', True, 'black')
 player2WinText = font.render('Player 2 Won', True, 'black')
 
-
 # Loader baggrunden og scaler det
 backgroundImg = pygame.image.load("Sprites/BackgroundStartMenu.png").convert_alpha()
 backgroundImg = pygame.transform.scale(backgroundImg, (screenWidth - screenHeight / 5, screenHeight - screenHeight / 5))
@@ -115,6 +114,7 @@ def newLevel():
     floorTiles.clear()
     outerWalls.clear()
     innerWalls.clear()
+    items.clear()
 
     # Sætter level variabler én op
     level += 1
@@ -126,11 +126,11 @@ def newLevel():
     placeOuterWalls()
     placeInnerWalls()
 
-    # Genererer items i spillet (som er boots, der booster spillernes hastighed)
+    # Generer items i spillet (som er boots, der booster spillernes hastighed)
     for i in range(level):
-        itemX = random.randint(0, canvasWidth - 20)
-        itemY = random.randint(0, canvasWidth - 20)
-        item = Item(surface, itemX, itemY, 10, 10, "red", "boots", False)
+        itemX = random.randint(centerX - math.floor(mazeW / 2) * spacing, centerX + math.floor(mazeW / 2) * spacing)
+        itemY = random.randint(startH, startH + mazeH * spacing)
+        item = Item(surface, itemX, itemY, 15, 15, "red", "boots")
         items.append(item)
 
     # Countdown for flisernes (tiles) forsvinding
@@ -143,21 +143,21 @@ def newLevel():
     player2 = Player(surface,  centerX + math.floor(mazeW/2) * spacing - wallW/2,
                      mazeH * spacing + wallW, 20, 20, "olivedrab1", 2)
 
-    # Gemmer spiller i en liste
+    # Gemmer spillerne i en liste
     players = [player1, player2]
 
 # Find dimensioner funktion
 def findDimensions():
     global mazeW, mazeH
 
-    # Sætter bredden og højden på labyrinten ud fra level
-    mazeW = random.randrange(2 + level, 5 + level)
-    mazeH = random.randrange(2 + level, 5 + level)
+    mazeW = 3 + random.randrange(level)
+    mazeH = 3 + random.randrange(level)
+
     #print(mazeW)
     #print(mazeH)
 
     # Sikre at labyrinten ALTID har en ulige bredde og højde
-    if mazeW % 2 == 0 or mazeH % 2 == 0:
+    if mazeW % 2 == 0 or mazeH % 2 == 0 or mazeW > 23 or mazeH > 23:
         print('error!')
         findDimensions()
 
@@ -174,14 +174,14 @@ def placeFloor():
         # Laver gulvet til højre
         else:
             floorH = Tile(surface,
-                            centerX - tileW/2 + spacing * (i - math.floor(i / math.ceil(mazeW/2)) * math.ceil(mazeW/2))
+                          centerX - tileW/2 + spacing * (i - math.floor(i / math.ceil(mazeW/2)) * math.ceil(mazeW/2))
                           - wallW, startH + spacing * math.floor(i/math.ceil(mazeW/2)) - wallW, tileW + 2 * wallW, tileW
                           + 2 * wallW, "darkslategray", i)
             floorTiles.append(floorH)
         # Laver gulvet til venstre
             floorV = Tile(surface, centerX - tileW/2 - spacing * (i - math.floor(i / math.ceil(mazeW / 2)) *
-                            math.ceil(mazeW / 2)) - wallW, startH + spacing * math.floor(i / math.ceil(mazeW / 2)) -
-                            wallW, tileW + 2 * wallW, tileW + 2 * wallW, "darkslategray", i)
+                          math.ceil(mazeW / 2)) - wallW, startH + spacing * math.floor(i / math.ceil(mazeW / 2)) -
+                          wallW, tileW + 2 * wallW, tileW + 2 * wallW, "darkslategray", i)
             floorTiles.append(floorV)
 
 
@@ -192,18 +192,18 @@ def placeTiles():
         # Laver en midte af fliser i labyrinten
         if i % math.ceil(mazeW/2) == 0:
             tilesM = Tile(surface, centerX - tileW/2, startH + spacing * math.floor(i/math.ceil(mazeW/2)),
-                            tileW, tileW, "darkslategray4", i)
+                          tileW, tileW, "darkslategray4", i)
             tiles.append(tilesM)
         else:
             # Laver fliserne til højre
             tilesH = Tile(surface, centerX - tileW/2 + spacing * (i - math.floor(i / math.ceil(mazeW/2)) *
-                            math.ceil(mazeW/2)), startH + spacing * math.floor(i/math.ceil(mazeW/2)), tileW, tileW,
-                            "darkslategray4", i)
+                          math.ceil(mazeW/2)), startH + spacing * math.floor(i/math.ceil(mazeW/2)), tileW, tileW,
+                          "darkslategray4", i)
             tiles.append(tilesH)
             # laver fliserne til venstre
             tilesV = Tile(surface, centerX - tileW/2 - spacing * (i - math.floor(i / math.ceil(mazeW / 2)) *
-                            math.ceil(mazeW / 2)), startH + spacing * math.floor(i / math.ceil(mazeW / 2)), tileW,
-                            tileW, "darkslategray4", i)
+                          math.ceil(mazeW / 2)), startH + spacing * math.floor(i / math.ceil(mazeW / 2)), tileW,
+                          tileW, "darkslategray4", i)
             tiles.append(tilesV)
 
 
@@ -211,15 +211,15 @@ def placeTiles():
 def placeOuterWalls():
     # Instances til væggene i labyrinten
     leftWall = Wall(surface, centerX + tileW/2 - spacing * math.floor((mazeW + 2)/2),
-                   startH - wallW, wallW, mazeH * spacing + wallW, "darkslategray2")
-    rightWall = Wall(surface, centerX - tileW / 2 - wallW + spacing * math.floor((mazeW + 2) / 2),
                     startH - wallW, wallW, mazeH * spacing + wallW, "darkslategray2")
+    rightWall = Wall(surface, centerX - tileW / 2 - wallW + spacing * math.floor((mazeW + 2) / 2),
+                     startH - wallW, wallW, mazeH * spacing + wallW, "darkslategray2")
     leftUpperWall = Wall(surface, centerX + tileW/2 - spacing * math.floor((mazeW + 2)/2),
-                   startH - wallW, math.floor(mazeW/2) * spacing + wallW, wallW, "darkslategray2")
+                         startH - wallW, math.floor(mazeW/2) * spacing + wallW, wallW, "darkslategray2")
     rightUpperWall = Wall(surface, centerX + tileW/2,
-                   startH - wallW, math.floor(mazeW/2) * spacing + wallW, wallW, "darkslategray2")
+                          startH - wallW, math.floor(mazeW/2) * spacing + wallW, wallW, "darkslategray2")
     bottomWall = Wall(surface, centerX + tileW/2 - spacing * math.floor((mazeW + 2)/2),
-                   startH + mazeH * spacing - wallW, mazeW * spacing + wallW, wallW, "darkslategray2")
+                      startH + mazeH * spacing - wallW, mazeW * spacing + wallW, wallW, "darkslategray2")
 
     outerWalls.append(leftWall)
     outerWalls.append(rightWall)
@@ -278,11 +278,6 @@ def placeInnerWalls():
             elif direction == 4:
                 xPos += 4 * wallH
 
-                                #############################
-                                ### START PÅ RANDOM POINT ###
-                                #############################
-
-# https://www.geeksforgeeks.org/python-ways-to-shuffle-a-list/
 
 # Funktion der tjekker om spillerne er ude af labyrinten og har fundet udgangen
 def checkEscape():
@@ -385,6 +380,14 @@ while Running:
 
     # Tegner items'ne i spillet
     for item in items:
+        if player1.hitbox.colliderect(item.hitbox):
+            player1moveSpeed += 0.5
+            print("SPEEDYYYY 1")
+            items.remove(item)
+        if player2.hitbox.colliderect(item.hitbox):
+            player2moveSpeed += 0.5
+            print("SPEDDDDYYY 2")
+            items.remove(item)
         item.draw()
 
     # Tegner udgangens grafik
@@ -392,11 +395,41 @@ while Running:
 
     if player1.OnTile and not player1.escaped:
         player1.move(wKey, sKey, aKey, dKey, player1moveSpeed)
+        player1.findDirection(wKey, sKey, aKey, dKey)
         player1.draw()
+
+    if player1.destroying:
+        player1.destroytime -= 1
+        if player1.destroytime > 50:
+            pygame.draw.rect(surface, (255, 5.1 * player1.destroytime, 0), player1.destroyHitbox)
+        else:
+            pygame.draw.rect(surface, (2.55 * player1.destroytime, 255 - 2.55 * player1.destroytime, 0),
+                             player1.destroyHitbox)
+
+    if player1.destroytime == 0:
+        player1.destroying = False
+        player1.destroytime = 100
+
+        for wall in innerWalls:
+            if player1.destroyHitbox.colliderect(wall.hitbox):
+                innerWalls.remove(wall)
 
     if player2.OnTile and not player2.escaped:
         player2.move(upKey, downKey, leftKey, rightKey, player2moveSpeed)
+        player2.findDirection(upKey, downKey, leftKey, rightKey)
         player2.draw()
+
+    if player2.destroying:
+        player2.destroytime -= 1
+        pygame.draw.rect(surface, (2.55 * player2.destroytime, 255, 0), player2.destroyHitbox)
+
+    if player2.destroytime == 0:
+        player2.destroying = False
+        player2.destroytime = 100
+
+        for wall in innerWalls:
+            if player2.destroyHitbox.colliderect(wall.hitbox):
+                innerWalls.remove(wall)
 
     # Tjekker for kollision mellem spillerne og væggene
     for object in outerWalls:
@@ -423,12 +456,7 @@ while Running:
             if floor.count >= countdown:
                 floorTiles.remove(floor)
 
-    # Debugging
-    print(len(floorTiles))
-    print(len(tiles))
-
     checkWin()
-
     checkEscape()
 
     for event in pygame.event.get():
@@ -441,9 +469,16 @@ while Running:
             # Trykker man SPACE øges level og der genereres en ny labyrint
             if event.key == pygame.K_SPACE:
                 newLevel()
+            if event.key == pygame.K_e:
+                player1.destroying = True
+            if event.key == pygame.K_l:
+                player2.destroying = True
         # Lukker spillet hvis den røde knap i venstre-øvre hjørne trykkes
         elif event.type == pygame.QUIT:
             Running = False
+
+    print(player1.destroytime)
+    print(player2.destroytime)
 
     # Mark Moment
     gameWindow.blit(pygame.transform.scale(surface, (screenHeight - screenHeight / 5,

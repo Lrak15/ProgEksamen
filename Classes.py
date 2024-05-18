@@ -26,18 +26,22 @@ class Player(GameObject):
     def __init__(self, game_window, xPos, yPos, width, height, color, player):
         super().__init__(game_window, xPos, yPos, width, height, color)
         self.player = player
+        self.rect = pygame.Rect(xPos, yPos, width, height)
         self.topCollide = False
         self.bottomCollide = False
         self.leftCollide = False
         self.rightCollide = False
         self.escaped = False
         self.OnTile = False
+        self.direction = None
+        self.destroying = False
+        self.destroyHitbox = pygame.Rect(self.x, self.y, self.w, self.h)
+        self.destroytime = 100
 
     # Metode der tjekker om spillere kolliderer med et objekt
     def checkCollision(self, object):
         self.hitbox = pygame.Rect(self.x, self.y, self.w, self.h)
         collisionTolerance = 10
-
         # Forskellige kollisionsscenarier
         if self.hitbox.colliderect(object.hitbox):
             if abs(self.hitbox.top - object.hitbox.bottom) < collisionTolerance:
@@ -62,15 +66,15 @@ class Player(GameObject):
         right_moved = 0
         key = pygame.key.get_pressed()
 
-        # Spilleren kan bevæge sig hvis ikke de er kollideret med et andet objekt
-        if key[up] and not self.topCollide:
-            up_moved = -movespeed
-        if key[down] and not self.bottomCollide:
-            down_moved = movespeed
-        if key[left] and not self.leftCollide:
-            left_moved = -movespeed
-        if key[right] and not self.rightCollide:
-            right_moved = movespeed
+        if not self.destroying:
+            if key[up] and not self.topCollide:
+                up_moved = -movespeed
+            if key[down] and not self.bottomCollide:
+                down_moved = movespeed
+            if key[left] and not self.leftCollide:
+                left_moved = -movespeed
+            if key[right] and not self.rightCollide:
+                right_moved = movespeed
 
         # Spilleren kan bevæge sig skråt vha. sinus
         if up_moved and left_moved != 0:
@@ -90,6 +94,29 @@ class Player(GameObject):
         self.y += up_moved + down_moved
 
         self.topCollide, self.bottomCollide, self.leftCollide, self.rightCollide = False, False, False, False
+
+    def findDirection(self, up, down, left, right):
+        key = pygame.key.get_pressed()
+
+        if key[left]:
+            self.direction = "left"
+        if key[right]:
+            self.direction = "right"
+        if key[up]:
+            self.direction = "up"
+        if key[down]:
+            self.direction = "down"
+
+        print(self.direction)
+
+        if self.direction == "up":
+            self.destroyHitbox = pygame.Rect(self.x, self.y - self.h, self.w, self.h)
+        if self.direction == "down":
+            self.destroyHitbox = pygame.Rect(self.x, self.y + self.h, self.w, self.h)
+        if self.direction == "left":
+            self.destroyHitbox = pygame.Rect(self.x - self.w, self.y, self.w, self.h)
+        if self.direction == "right":
+            self.destroyHitbox = pygame.Rect(self.x + self.w, self.y, self.w, self.h)
 
 
 # Tile klassen
@@ -114,10 +141,9 @@ class Wall(GameObject):
 
 # Item klassen
 class Item(GameObject):
-    def __init__(self, game_window, xPos, yPos, width, height, color, name, pickedUp):
+    def __init__(self, game_window, xPos, yPos, width, height, color, name):
         super().__init__(game_window, xPos, yPos, width, height, color)
         self.name = name    # Navn på item
-        self.picked = pickedUp  # Bool der holder styr på om spilleren har samlet itemet op
 
 # Button klassen
 class Button:   # (credit: Coding With Russ YT)
@@ -147,7 +173,7 @@ class Button:   # (credit: Coding With Russ YT)
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
 
-        # Tegner rent faktisk knappen på skærmen
+        # Tegner rent faktisk knappen på skærmenx
         self.gw.blit(self.image, self.rect)
 
         return action
