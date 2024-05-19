@@ -135,7 +135,6 @@ def newLevel():
 
     # Countdown for flisernes (tiles) forsvinding
     countdown = math.ceil(mazeW/2) * mazeH + 5
-    #(countdown)
 
     # Player instances
     player1 = Player(surface, centerX - math.floor(mazeW/2) * spacing - wallW/2,

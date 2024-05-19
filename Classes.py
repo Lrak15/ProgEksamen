@@ -26,7 +26,6 @@ class Player(GameObject):
     def __init__(self, game_window, xPos, yPos, width, height, color, player):
         super().__init__(game_window, xPos, yPos, width, height, color)
         self.player = player
-        self.rect = pygame.Rect(xPos, yPos, width, height)
         self.topCollide = False
         self.bottomCollide = False
         self.leftCollide = False
