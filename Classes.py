@@ -106,7 +106,7 @@ class Player(GameObject):
         if key[down]:
             self.direction = "down"
 
-        print(self.direction)
+        #print(self.direction)
 
         if self.direction == "up":
             self.destroyHitbox = pygame.Rect(self.x, self.y - self.h, self.w, self.h)

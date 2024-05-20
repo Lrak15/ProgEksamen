@@ -289,6 +289,7 @@ def checkEscape():
     if player1.escaped == True and player2.escaped == True:
         newLevel()
 
+
 # Funktion der tjekker om spillerne har vundet
 def checkWin():
     global Player1Win, Player2Win
@@ -379,11 +380,13 @@ while Running:
     for item in items:
         if player1.hitbox.colliderect(item.hitbox):
             player1moveSpeed += 0.5
-            print("SPEEDYYYY 1")
+            if player1moveSpeed == 10:
+                player1moveSpeed = 3
             items.remove(item)
         if player2.hitbox.colliderect(item.hitbox):
             player2moveSpeed += 0.5
-            print("SPEDDDDYYY 2")
+            if player2moveSpeed == 10:
+                player2moveSpeed = 3
             items.remove(item)
         item.draw()
 
@@ -439,7 +442,7 @@ while Running:
         player2.checkCollision(object)
 
     # Fliserne forsvinder hurtigere jo højere level man er i
-    # countdown -= 0.01 + 0.005 * level
+    countdown -= 0.01 + 0.005 * level
 
     for i in range(2):
         for tile in tiles:
