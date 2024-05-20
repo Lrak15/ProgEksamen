@@ -8,7 +8,6 @@
 import math
 import random
 import pygame
-from pygame import mixer
 from Classes import Tile
 from Classes import Player
 from Classes import Wall
@@ -17,7 +16,6 @@ from Classes import Item
 
 # Initialisering af frameworks/libraries
 pygame.init()
-mixer.init()
 
 # Sætter en framerate for spillet
 fps = 69
@@ -400,7 +398,7 @@ while Running:
     if player1.destroying:
         player1.destroytime -= 1
         if player1.destroytime > 50:
-            pygame.draw.rect(surface, (255, 5.1 * player1.destroytime, 0), player1.destroyHitbox)
+            pygame.draw.rect(surface, (255, 2.55 * player1.destroytime, 0), player1.destroyHitbox)
         else:
             pygame.draw.rect(surface, (2.55 * player1.destroytime, 255 - 2.55 * player1.destroytime, 0),
                              player1.destroyHitbox)
@@ -441,9 +439,8 @@ while Running:
         player2.checkCollision(object)
 
     # Fliserne forsvinder hurtigere jo højere level man er i
-    countdown -= 0.01 + 0.005 * level
+    # countdown -= 0.01 + 0.005 * level
 
-    # Placere fliserne
     for i in range(2):
         for tile in tiles:
             # Fjerner fliser

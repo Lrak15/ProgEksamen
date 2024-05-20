@@ -172,7 +172,7 @@ class Button:   # (credit: Coding With Russ YT)
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
 
-        # Tegner rent faktisk knappen på skærmenx
+        # Tegner rent faktisk knappen på skærmen
         self.gw.blit(self.image, self.rect)
 
         return action
