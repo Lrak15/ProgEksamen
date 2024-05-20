@@ -126,7 +126,7 @@ def newLevel():
 
     # Generer items i spillet (som er boots, der booster spillernes hastighed)
     for i in range(level):
-        itemX = random.randint(centerX - math.floor(mazeW / 2) * spacing, centerX + math.floor(mazeW / 2) * spacing)
+        itemX = random.randint(int(centerX - math.floor(mazeW / 2) * spacing), int(centerX + math.floor(mazeW / 2) * spacing))
         itemY = random.randint(startH, startH + mazeH * spacing)
         item = Item(surface, itemX, itemY, 15, 15, "red", "boots")
         items.append(item)
@@ -139,9 +139,6 @@ def newLevel():
                      mazeH * spacing + wallW, 20, 20, "orchid1", 1)
     player2 = Player(surface,  centerX + math.floor(mazeW/2) * spacing - wallW/2,
                      mazeH * spacing + wallW, 20, 20, "olivedrab1", 2)
-
-    # Gemmer spillerne i en liste
-    players = [player1, player2]
 
 # Find dimensioner funktion
 def findDimensions():
